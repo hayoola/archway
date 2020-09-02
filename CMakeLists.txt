@@ -18,8 +18,8 @@ add_executable(${PROJECT_NAME} main.cc)
 
 ##########
 # If you include the drogon source code locally in your project, use this method to add drogon
-# add_subdirectory(drogon)
-# target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
+add_subdirectory(drogon)
+target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 ##########
 
 find_package(Drogon CONFIG REQUIRED)
