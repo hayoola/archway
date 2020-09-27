@@ -11,28 +11,20 @@
 namespace archway {
 
   /**
-   * The type code which is used in the Action struct
+   * The code, which returns from archway::Functions
   */
-  enum class ActionType {
-    FAIL,
-    ERROR,
-    SYNTH,
-    PASS,
-    PIPE,
-    HASH,
-    PURGE,
-    RESTART,
-    FETCH,
-    ABONDON
+  enum class Action {
+    kFail,    // Fatal error: deliver a short error response ==> Redundant (we can return error response)
+    kError,   // Transition to kBackendError stage, which can deliver descriptive errors ==> Redundant
+    kPass,
+    kPipe,
+    kHash,
+    kPurge,
+    kRestart,
+    kFetch,
+    kDeliver
   };
 
-  /**
-   * The return type of StageFunctions
-  */ 
-  struct Action {
-    ActionType  type;
-    short       status_code;
-  };
 
 
   /**
@@ -49,10 +41,10 @@ namespace archway {
     kPurge,
     kMiss,
     kHit,
-    kDeliver,
-    // kSynth,
     kBackendFetch,
-    kBackendResponse
+    kBackendResponse,
+    kBackendError,
+    kDeliver
   };
 
 }

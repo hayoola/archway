@@ -15,7 +15,7 @@
 namespace archway {
 
 
-  class SetBackendInstruction : public virtual drogon::DrObjectBase {
+  class SetBackendInstruction : public drogon::DrObject<SetBackendInstruction> {
 
     public:
     

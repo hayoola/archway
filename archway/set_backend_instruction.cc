@@ -1,6 +1,6 @@
 /**
  *
- *  SetBackendInstruction.cc
+ *  set_backend_instruction.cc
  *
 */
 
