@@ -1,5 +1,6 @@
 message(STATUS "Configuring Archway Tests")
 
+
 add_executable(skeleton_test_unittest skeleton_test.cpp)
 
 
@@ -20,8 +21,8 @@ set( ARCHWAY_NODE_PROCESSORS_SRC
 
 
 
-set_property(TARGET ${UNITTEST_TARGETS}
-             PROPERTY CXX_STANDARD ${DROGON_CXX_STANDARD})
+#set_property(TARGET ${UNITTEST_TARGETS}
+#             PROPERTY CXX_STANDARD ${DROGON_CXX_STANDARD})
 set_property(TARGET ${UNITTEST_TARGETS} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${UNITTEST_TARGETS} PROPERTY CXX_EXTENSIONS OFF)
 

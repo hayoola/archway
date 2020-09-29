@@ -15,7 +15,7 @@
 
 namespace archway {
 
-  class RootNodeProcessor : public virtual NodeProcessor<RootNodeProcessor> {
+  class RootNodeProcessor : public NodeProcessor<RootNodeProcessor> {
 
     public:
       RootNodeProcessor();

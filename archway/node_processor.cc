@@ -38,7 +38,10 @@ void NodeProcessorRegistry::registerProcessor(
 
   LOG_DEBUG << "Register NodeProcessor: " << node_name;
 
-  getMap().insert(std::make_pair(node_name, factory_func));
+  auto the_result_pair = getMap().emplace(node_name, factory_func);
+  if( ! the_result_pair.second ) {
+    LOG_ERROR << "Can't register the NodeProcessor for: " << node_name;
+  }
 }
 
 

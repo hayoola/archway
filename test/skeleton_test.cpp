@@ -8,11 +8,11 @@
 #include "../archway/compiler.h"
 
 
-auto HasStaticYName = archway::is_valid([](auto t) -> decltype( decltype(t)::type::YName()) {});
+auto HasStaticYName = archway::is_valid([](auto t) -> decltype( decltype(t)::type::YName()) {return 0;});
 
 
 
-auto HasYamlNodeName = archway::is_valid([](auto&& x) -> decltype(x.YamlNodeName()) { });
+auto HasYamlNodeName = archway::is_valid([](auto&& x) -> decltype(x.YamlNodeName()) { return 0;});
 
 template <class T> auto YamlNodeName(T& obj) 
   -> typename std::enable_if<decltype(HasYamlNodeName(obj))::value, std::string>::type {

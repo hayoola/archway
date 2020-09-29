@@ -39,8 +39,10 @@ int RootNodeProcessor::ProcessNode(
     }
 
     the_result = the_processor->ProcessNode( the_node, archway);
-    if( the_result != 0 )
+    if( the_result != 0 ) {
       break;
+    }
+      
   }
 
   return the_result;

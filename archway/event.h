@@ -46,7 +46,7 @@ namespace archway {
       }
 
 
-      std::string Type() {
+      const std::string Type() {
         
         std::string the_type{""};
 
@@ -59,7 +59,7 @@ namespace archway {
       }
 
 
-      std::string Subject() {
+      const std::string Subject() {
 
         std::string the_subject{""};
 
@@ -71,7 +71,7 @@ namespace archway {
         return the_subject;
       }
 
-      void SetData( std::string in_data ) {
+      void SetData( const std::string& in_data ) {
 
         auto the_iter = params_.find(EventFields::kData);
 
@@ -88,8 +88,8 @@ namespace archway {
     private:
 
       void _init_vital_fields(
-          std::string in_type,
-          std::string in_subject
+          std::string& in_type,
+          std::string& in_subject
       ) {
           params_.emplace(EventFields::kType, in_type);
           params_.emplace(EventFields::kSubject, in_subject);

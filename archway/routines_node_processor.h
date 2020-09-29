@@ -11,7 +11,7 @@
 
 namespace archway {
 
-  class RoutinesNodeProcessor: public virtual NodeProcessor<RoutinesNodeProcessor> {
+  class RoutinesNodeProcessor: public NodeProcessor<RoutinesNodeProcessor> {
 
     public:
 
@@ -20,10 +20,10 @@ namespace archway {
       virtual int ProcessNode( 
         const YAML::Node& node,
         const Archway* archway
-      );
+      ) override;
 
       static std::string YamlNodeName() {
-        return "routines"; 
+        return "routines";
       }
   };
 
