@@ -9,25 +9,35 @@
 #include <drogon/DrObject.h>
 #include <drogon/HttpRequest.h>
 #include "archway_types.h"
+#include "initable.h"
 
 
 
 namespace archway {
 
 
-  class SetBackendInstruction : public drogon::DrObject<SetBackendInstruction> {
+  /**
+   * An Instruction object.
+   * Ironically, all Instruction object are NOT virtual,
+   *  which makes them faster to execute.
+  */
+  class SetBackendInstruction {
 
     public:
     
-    SetBackendInstruction() {
+      SetBackendInstruction(const int in_backend_index) :
+        backend_index_(in_backend_index) {
 
-    }
+      }
 
-    Action operator () (const drogon::HttpRequestPtr & request) {
-      return processRequest(request);
-    }
+      Action operator () (Message& in_message) {
+        return processRequest(in_message);
+      }
 
-    Action processRequest(const drogon::HttpRequestPtr &);
+      Action processRequest(Message &);
+
+    private:
+      int backend_index_;
 
   };
 

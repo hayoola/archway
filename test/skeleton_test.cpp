@@ -30,7 +30,7 @@ template <class T> auto YamlNodeName(T& obj)
 
 TEST(Archway_Skeleton_Test, Enumeration) {
 
-  EXPECT_EQ(archway::Stage::kReceive, 0);
+  EXPECT_EQ( static_cast<int>(archway::Stage::kReceive), 0);
 }
 
 

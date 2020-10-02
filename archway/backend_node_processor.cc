@@ -44,6 +44,7 @@ int BackendNodeProcessor::ProcessNode(
     );
 
     // Now Save the newly constructed Backend object into the Archway storage.
+    // Check if the_backend == nulptr
     // archway->SaveBackend(the_backend);
 
     the_result = 0;

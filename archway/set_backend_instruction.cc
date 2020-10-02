@@ -11,11 +11,22 @@ using namespace drogon;
 using namespace archway;
 
 
+
+
+
+
+/**
+ * This method put the backend_index_ into the Message,
+ *  so the Router knows what to do
+*/
 Action SetBackendInstruction::processRequest(
-  const drogon::HttpRequestPtr &in_req) {
+  Message& in_message) {
 
   LOG_DEBUG << "SetBackend Instruction...";
+  in_message.SetParam(ParamID::kBackendIndex, backend_index_);
 
-  return Action();
+  return Action::kContinue;
 
 }
+
+

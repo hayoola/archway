@@ -31,9 +31,11 @@ namespace archway
 
     }
 
-    void AddInstruction( const Instruction& instruction);
+    void AddInstruction( const Instruction in_instruction) {
+      instructions_.emplace_back(in_instruction);
+    }
 
-    void Run();
+    Action Run(const Message &);
 
     private:
 

@@ -1,11 +1,25 @@
 message(STATUS "Configuring Archway Tests")
 
 
-add_executable(skeleton_test_unittest skeleton_test.cpp)
+add_executable(
+  skeleton_test_unittest skeleton_test.cpp
+)
+
+add_executable(
+  message_test_unittest message_test.cpp
+)
+
+
+add_executable(
+  host_program_test_unittest host_program_test.cpp
+)
+
 
 
 set(UNITTEST_TARGETS
   skeleton_test_unittest
+  message_test_unittest
+  host_program_test_unittest
 )
 
 # Since archway NodeProcessor objects register themselves durng
@@ -16,6 +30,7 @@ set( ARCHWAY_NODE_PROCESSORS_SRC
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/root_node_processor.cc
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/declarations_node_processor.cc
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/routines_node_processor.cc
+ ${CMAKE_CURRENT_SOURCE_DIR}/../archway/archway.cc
 )
 #message(STATUS "Test Archway files: " ${ARCHWAY_NODE_PROCESSORS_SRC})
 
