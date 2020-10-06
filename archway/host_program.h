@@ -38,6 +38,30 @@ namespace archway {
         return stage_functions_[static_cast<int>(in_stage)];
       }
 
+
+      static Stage StringToStage( std::string in_string ) {
+
+        Stage the_stage{Stage::kInvalid};
+
+        const static std::map<std::string, Stage> s_string_to_stage_map {
+          {"receiveRequest", Stage::kReceive},
+          {"hashRequest", Stage::kHash},
+          {"missRequest", Stage::kMiss},
+          {"hitRequest", Stage::kHit},
+          {"backendFetch", Stage::kBackendFetch},
+          {"backendResponse", Stage::kBackendResponse},
+          {"backendError", Stage::kBackendError},
+          {"deliverResponse", Stage::kDeliver}
+        };
+
+        auto the_iter = s_string_to_stage_map.find(in_string);
+        if( the_iter != s_string_to_stage_map.end() ) {
+          the_stage = the_iter->second;
+        }
+
+        return the_stage;
+      }
+
     private:
 
       std::vector<std::shared_ptr<Function>> 

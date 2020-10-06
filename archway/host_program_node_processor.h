@@ -1,21 +1,24 @@
 /**
- * declarations_node_processor.h
+ * host_program_node_processor.h 
  * 
- * Processor of the 'declarations' node of the configuration language
 */
+
 
 #pragma once
 
+
 #include "node_processor.h"
+#include "host_program.h"
 
 
 namespace archway {
 
-  class DeclarationsNodeProcessor : public virtual NodeProcessor<DeclarationsNodeProcessor> {
+
+  class HostProgramNodeProcessor : public NodeProcessor<HostProgramNodeProcessor> {
 
     public:
 
-      DeclarationsNodeProcessor();
+      HostProgramNodeProcessor() {}
 
       virtual int ProcessNode( 
         const YAML::Node& node,
@@ -23,9 +26,11 @@ namespace archway {
         std::any in_context = nullptr
       ) override;
 
+      
       static std::string YamlNodeName() {
-        return "declarations"; 
+        return "hostProgram";
       }
+
 
   };
 }

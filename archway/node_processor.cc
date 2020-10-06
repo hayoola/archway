@@ -14,14 +14,14 @@ using namespace archway;
 
 
 
-std::unique_ptr<NodeProcessorBase> NodeProcessorRegistry::NewInstance(
+std::shared_ptr<NodeProcessorBase> NodeProcessorRegistry::NewInstance(
   const std::string& in_node_name
 ) {
 
   auto iter = getMap().find(in_node_name);
   if( iter != getMap().end()) {
 
-    return std::unique_ptr<NodeProcessorBase> (iter->second());
+    return std::shared_ptr<NodeProcessorBase> (iter->second());
   
   } else {
 

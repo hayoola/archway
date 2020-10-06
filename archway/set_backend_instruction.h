@@ -18,7 +18,7 @@ namespace archway {
 
   /**
    * An Instruction object.
-   * Ironically, all Instruction object are NOT virtual,
+   * Ironically, all Instruction object are  non-virtual,
    *  which makes them faster to execute.
   */
   class SetBackendInstruction {

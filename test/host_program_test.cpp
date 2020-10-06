@@ -7,7 +7,7 @@ using namespace archway;
 
 struct DummyInstruction {
 
-  archway::Action operator () (const archway::Message& in_message) {
+  archway::Action operator () ( archway::Message& in_message) {
     return Action::kPass;
   }
 };

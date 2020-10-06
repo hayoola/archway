@@ -17,7 +17,7 @@ namespace archway
 {
   
   using Instruction = 
-    std::function<Action(const Message &)>
+    std::function<Action( Message &)>
   ;  
 
   /**
@@ -35,7 +35,7 @@ namespace archway
       instructions_.emplace_back(in_instruction);
     }
 
-    Action Run(const Message &);
+    Action Run( Message &);
 
     private:
 

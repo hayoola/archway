@@ -21,12 +21,12 @@ namespace archway {
 
     public:
 
-      Compiler( const Archway& in_archway);
+      Compiler( Archway& in_archway);
 
       int Compile(const std::string& in_config_content );
 
 
       private:
-        const Archway& archway_;
+        Archway& archway_;
   };
 }

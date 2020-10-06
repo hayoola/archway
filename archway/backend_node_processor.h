@@ -14,7 +14,9 @@
 namespace archway {
 
   using BackendFactoryFunc = 
-    std::function<Backend *(const std::string& in_name, const YAML::Node& node)>
+    std::function<
+      std::shared_ptr<Backend>(const std::string& in_name, const YAML::Node& node)
+    >
   ;
 
   class BackendNodeProcessor : public NodeProcessor<BackendNodeProcessor> {
@@ -25,7 +27,8 @@ namespace archway {
 
       virtual int ProcessNode( 
         const YAML::Node& node,
-        const Archway* archway
+        Archway* archway,
+        std::any in_context = nullptr
       ) override;
 
       static std::string YamlNodeName() {
@@ -44,7 +47,7 @@ namespace archway {
       }
 
       
-      std::unique_ptr<Backend> _new_backend(
+      std::shared_ptr<Backend> _new_backend(
         const std::string& in_kind,
         const std::string& in_name,
         const YAML::Node& in_node
@@ -53,7 +56,7 @@ namespace archway {
         auto the_iter = registry_.find(in_kind);
         if( the_iter != registry_.end() ) {
 
-          return std::unique_ptr<Backend> (the_iter->second(in_name, in_node));
+          return the_iter->second(in_name, in_node);
 
         } else {
 
@@ -63,7 +66,12 @@ namespace archway {
 
       std::unordered_map<
         std::string, 
-        std::function<Backend *(const std::string& in_name, const YAML::Node& in_node)>
+        std::function<
+          std::shared_ptr<Backend> (
+            const std::string& in_name, 
+            const YAML::Node& in_node
+          )
+        >
       > registry_;
   };
 

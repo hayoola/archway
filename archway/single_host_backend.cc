@@ -15,6 +15,8 @@ SingleHostBackend::SingleHostBackend(
   const YAML::Node& node
 ) : Backend(in_name, node) {
 
+  //TODO: Remove this!
+  int the_dummy{8765};
 
 }
 

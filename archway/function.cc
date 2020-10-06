@@ -10,7 +10,7 @@
 using namespace drogon;
 using namespace archway;
 
-Action Function::Run( const Message & in_message) {
+Action Function::Run( Message & in_message) {
 
   Action the_result{Action::kInvalid};
 

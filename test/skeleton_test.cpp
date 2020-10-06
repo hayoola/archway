@@ -30,7 +30,7 @@ template <class T> auto YamlNodeName(T& obj)
 
 TEST(Archway_Skeleton_Test, Enumeration) {
 
-  EXPECT_EQ( static_cast<int>(archway::Stage::kReceive), 0);
+  EXPECT_EQ( static_cast<int>(archway::Stage::kReceive), 1);
 }
 
 
@@ -51,8 +51,19 @@ TEST(Archway_Skeleton_Test, Compiler) {
 
   const std::string the_yaml = R"(
     confVersion: core/v1alpha1
-    declarations: 
+    declarations:
+    - backend:
+        name: baseOne
+        kind: single
+        hosts:
+        - address: 127.0.0.1:8088
     routines:
+    - hostProgram:
+        hosts: [www.example.com, example.com]
+        functions:
+          - stage: receiveRequest
+            instructions:
+            - setBackend: baseOne
   )";
 
   archway::Archway  the_archway;

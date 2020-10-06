@@ -42,7 +42,8 @@ namespace archway {
    * catch the request or response and processes it.
   */
   enum class Stage {
-    kReceive = 0,
+    kInvalid,
+    kReceive,
     kPipe,
     kPass,
     kHash,

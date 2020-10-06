@@ -17,10 +17,11 @@ RootNodeProcessor::RootNodeProcessor()
 
 int RootNodeProcessor::ProcessNode( 
   const YAML::Node& node,
-  const Archway* archway
+  Archway* archway,
+  std::any in_context
 ) {
   
-  int the_result = 0; // Indicate OK!
+  int the_result = 0; // Indicates OK!
 
   using NodeNameIterator_t = std::vector<std::string>::const_iterator;
 

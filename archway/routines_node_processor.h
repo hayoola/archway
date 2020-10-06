@@ -19,7 +19,8 @@ namespace archway {
 
       virtual int ProcessNode( 
         const YAML::Node& node,
-        const Archway* archway
+        Archway* archway,
+        std::any in_context = nullptr
       ) override;
 
       static std::string YamlNodeName() {

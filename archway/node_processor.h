@@ -11,6 +11,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <string_view>
 #include <functional>
 #include <memory>
 #include <trantor/utils/Logger.h>
@@ -31,7 +32,8 @@ namespace archway {
 
       virtual int ProcessNode( 
         const YAML::Node& node,
-        const Archway* archway
+        Archway* archway,
+        std::any in_context = nullptr
       ) = 0;
 
   };
@@ -63,7 +65,7 @@ namespace archway {
        * @return A generic unique pointer of the NodeProcessor object 
        *  (non-constant for enabling the caller to take the ownership)
       **/
-      static std::unique_ptr<NodeProcessorBase> NewInstance(
+      static std::shared_ptr<NodeProcessorBase> NewInstance(
         const std::string &node_name
       );
 
@@ -94,7 +96,7 @@ namespace archway {
       NodeProcessor() {
         
         allocator_.EnableRegistration();
-      };
+      }
 
 
     private:
