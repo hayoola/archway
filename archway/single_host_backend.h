@@ -16,12 +16,15 @@ namespace archway {
 
       SingleHostBackend(
         const std::string& in_name,
-        const YAML::Node& node
+        const std::string& in_host_address
       );
 
       std::string ActiveAccessPath() override;
 
       int HandleEvent( const Event& in_event) override;
+
+    private:
+      const std::string host_address_;
 
   };
 

@@ -34,6 +34,7 @@ set( ARCHWAY_NODE_PROCESSORS_SRC
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/host_program_node_processor.cc
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/functions_node_processor.cc
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/set_backend_node_processor.cc
+ ${CMAKE_CURRENT_SOURCE_DIR}/../archway/single_host_backend_node_processor.cc
  ${CMAKE_CURRENT_SOURCE_DIR}/../archway/archway.cc
 )
 #message(STATUS "Test Archway files: " ${ARCHWAY_NODE_PROCESSORS_SRC})

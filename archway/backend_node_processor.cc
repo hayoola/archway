@@ -13,14 +13,6 @@ using namespace archway;
 
 BackendNodeProcessor::BackendNodeProcessor() {
 
-  _register_backend_constructor(
-    "single", 
-    [](const std::string& in_name, const YAML::Node& in_node) {
-      //return new SingleHostBackend(in_name, in_node);
-      return std::make_shared<SingleHostBackend>(in_name, in_node);
-    }
-  );
-
 }
 
 
@@ -44,6 +36,23 @@ int BackendNodeProcessor::ProcessNode(
       break;
     }
 
+    std::string the_kind_string = the_kind.as<std::string>();
+
+    // Dispatch the node processing to the specialized node processor
+    //  that knows about this `kind` of backend
+    auto the_processor = NodeProcessorRegistry::NewInstance( the_kind_string);
+    if( ! the_processor ) {
+      the_result = -3;
+      break;
+    }
+
+    the_result = the_processor->ProcessNode(
+      in_node,
+      archway
+    );
+
+    
+    /*
     auto the_name = in_node["name"];
     if( ! the_name) {
       the_result = -3;
@@ -55,6 +64,7 @@ int BackendNodeProcessor::ProcessNode(
       break;
     }
 
+    
     auto the_backend = _new_backend(
       the_kind.as<std::string>(), 
       the_name.as<std::string>(), 
@@ -67,9 +77,8 @@ int BackendNodeProcessor::ProcessNode(
     }
 
     // Now Save the newly constructed Backend object into the Archway storage.
-    // Check if the_backend == nulptr
     archway->AddBackend(the_backend);
-
+    */
     
 
   } while( false );

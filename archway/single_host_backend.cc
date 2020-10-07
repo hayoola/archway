@@ -12,8 +12,9 @@ using namespace archway;
 
 SingleHostBackend::SingleHostBackend(
   const std::string& in_name,
-  const YAML::Node& node
-) : Backend(in_name, node) {
+  const std::string& in_host_address
+) : Backend(in_name),
+    host_address_(in_host_address) {
 
   //TODO: Remove this!
   int the_dummy{8765};
@@ -22,10 +23,9 @@ SingleHostBackend::SingleHostBackend(
 
 std::string SingleHostBackend::ActiveAccessPath() {
 
-  std::string the_path{""};
-
-  return the_path;
+  return host_address_;
 }
+
 
 int SingleHostBackend::HandleEvent(
   const Event& in_event

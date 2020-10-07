@@ -1,25 +1,22 @@
 /**
- * backend_node_processor.h
+ * single_host_backend_node_processor.h
  * 
-*/
+*/ 
 
 
 #pragma once
 
 
 #include "node_processor.h"
-#include "backend.h"
 
 
 namespace archway {
 
-  
-
-  class BackendNodeProcessor : public NodeProcessor<BackendNodeProcessor> {
+  class SingleHostBackendNodeProcessor : public NodeProcessor<SingleHostBackendNodeProcessor> {
 
     public:
-
-      BackendNodeProcessor();
+      
+      SingleHostBackendNodeProcessor() {}
 
       virtual int ProcessNode( 
         const YAML::Node& node,
@@ -28,10 +25,7 @@ namespace archway {
       ) override;
 
       static std::string YamlNodeName() {
-        return "backend"; 
+        return "singleHost"; 
       }
-
   };
-
-
 }

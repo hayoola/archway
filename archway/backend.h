@@ -23,10 +23,7 @@ namespace archway {
       Backend() = delete;
 
       Backend( 
-        const std::string& in_name,
-        const YAML::Node& node
-      ) :
-        name_(in_name) {}
+        const std::string& in_name) : name_(in_name) {}
 
       virtual std::string ActiveAccessPath() = 0;
 

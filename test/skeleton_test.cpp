@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <string>
+#include <map>
+#include <iostream>
 #include "../archway/archway_types.h"
 #include "../archway/utils/is_valid.h"
 #include "../archway/node_processor.h"
@@ -54,7 +56,7 @@ TEST(Archway_Skeleton_Test, Compiler) {
     declarations:
     - backend:
         name: baseOne
-        kind: single
+        kind: singleHost
         hosts:
         - address: 127.0.0.1:8088
     routines:
@@ -72,6 +74,49 @@ TEST(Archway_Skeleton_Test, Compiler) {
   
   EXPECT_EQ(the_result, 0);
 
+}
+
+
+TEST(Archway_Skeleton_Test, wildcard_playground)  {
+
+  const std::map<std::string, int> the_map{
+    {"com.sakura", 1},
+    {"com.idea", 2},
+    {"com.hayoola.boom", 3}
+  };
+
+  
+  int the_value{-1};
+  std::string the_key{""};
+  auto the_key_to_search{"com.hayoola.boom.host1"};
+  auto the_lower_iter = the_map.lower_bound(the_key_to_search);
+  
+  if( the_lower_iter == the_map.end()) {
+
+    
+    the_key = the_map.rbegin()->first;
+    the_value = the_map.rbegin()->second;
+
+  } else {
+
+    auto the_iter = the_lower_iter;
+    the_iter--;
+    the_key = the_iter->first;
+    the_value = the_iter->second;
+
+  }
+
+  //TODO: We should ensure the found key is indeed a prefix of
+  //TODO:   the key to find!
+
+  std::cout << "\nThe key to search: " << the_key_to_search <<
+    "\nThe candidate key: " << the_key << 
+    " The candidate value: " << the_value << "\n"
+  ;
+  
+  
+  
+  
 }
 
 

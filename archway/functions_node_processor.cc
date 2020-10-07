@@ -21,7 +21,7 @@ int FunctionsNodeProcessor::ProcessNode(
   std::any in_context
 ) {
 
-  int the_result = 0;
+  int the_result{0};
 
   do {
 
