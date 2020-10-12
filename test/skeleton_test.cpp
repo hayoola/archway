@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 #include <string>
+#include <vector>
 #include <map>
 #include <iostream>
 #include "../archway/archway_types.h"
 #include "../archway/utils/is_valid.h"
+#include "../archway/utils/string_utils.h"
 #include "../archway/node_processor.h"
 #include "../archway/root_node_processor.h"
 #include "../archway/archway.h"
@@ -74,6 +76,21 @@ TEST(Archway_Skeleton_Test, Compiler) {
   
   EXPECT_EQ(the_result, 0);
 
+}
+
+
+TEST(Archway_Skeleton_Test, string_utils) {
+
+  const std::string the_string{"*.example.com"};
+
+  std::vector<std::string> the_tokens = archway::StringUtils::SplitString(the_string, '.');
+  EXPECT_EQ( the_tokens.size(), 3);
+  EXPECT_EQ( the_tokens[0], "*");
+  EXPECT_EQ( the_tokens[1], "example");
+  EXPECT_EQ( the_tokens[2], "com");
+
+  std::string the_inverted_string = archway::StringUtils::InvertHostName(the_string);
+  EXPECT_EQ( the_inverted_string, "com.example");
 }
 
 

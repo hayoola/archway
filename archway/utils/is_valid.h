@@ -77,7 +77,7 @@ namespace archway {
   // auto HasStaticYName = is_valid([](auto t) -> decltype( decltype(t)::type::YName()) {});
 
   
-  // A utility constrict to wrap a type into values like type_c<MyClass>
+  // A utility construct to wrap a type into values like type_c<MyClass>
   //  It enables us to check member validation of a type without instantiation.
   //  Inspired by boost::hana
   template <typename T>

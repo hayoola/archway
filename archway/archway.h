@@ -13,6 +13,7 @@
 #include <string>
 #include "backend.h"
 #include "host_program.h"
+#include "router.h"
 
 
 
@@ -50,6 +51,8 @@ namespace archway {
         return the_index;
       }
 
+      
+      
       std::shared_ptr<Backend> GetBackend( int in_index) {
 
         std::shared_ptr<Backend> the_backend{nullptr};
@@ -62,35 +65,22 @@ namespace archway {
         return the_backend;
       }
 
-
+      
+      
       void AddHostProgram(
         const std::vector<std::string>& in_host_names,
         const std::shared_ptr<HostProgram> in_host_program
       ) {
-
-        for( auto const& the_host_name: in_host_names) {
-          host_programs_.emplace(the_host_name, in_host_program);
-        }
+        router_.AddHostProgram(in_host_names, in_host_program);
       }
 
       
-      std::shared_ptr<HostProgram> GetHostProgram(const std::string& in_host_name){
-
-        std::shared_ptr<HostProgram> the_host_program{nullptr};
-
-        auto the_iter = host_programs_.find(in_host_name);
-        if( the_iter != host_programs_.end() ) {
-          the_host_program = the_iter->second;
-        }
-
-        return the_host_program;
-      }
-
 
     private:
+
       std::unordered_map<std::string, int> backends_map_;
       std::vector<std::shared_ptr<Backend>> backends_vector;
-      std::unordered_map<std::string, std::shared_ptr<HostProgram>> host_programs_;
+      Router router_;
 
   };
 }

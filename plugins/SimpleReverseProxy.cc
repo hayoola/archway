@@ -47,7 +47,7 @@ void SimpleReverseProxy::initAndStart(const Json::Value &config)
     }
     
     // Init a ThreadStorage to store the HTTPClient pointers, which we need
-    //  to forward the incomming requests to them.
+    //  to forward the incoming requests to them.
     // The client pointers are stored in a std::vector, which is resized here
     //  for performance purposes.
     // The `connectionFactor_` is the number of clients which we create for 
@@ -151,7 +151,7 @@ void SimpleReverseProxy::preRouting(
             
             if (result == ReqResult::Ok) {
                 
-                LOG_DEBUG << "Response recieved!";
+                LOG_DEBUG << "Response received!";
 
                 auto headers = resp->headers();
                 auto the_body{ resp->body() };    
