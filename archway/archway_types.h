@@ -16,12 +16,13 @@
 
 namespace archway {
 
+  class HostProgram;
+
   /**
-   * The code, which returns from archway::Functions
+   * The code, which returns from archway::DynamicFunctions
   */
+  /*
   enum class Action {
-    kInvalid,
-    kContinue,
     kFail,    // Fatal Internal (archway) error: deliver a short error response
     kError,   // ==> Redundant: 
     kPass,
@@ -30,19 +31,22 @@ namespace archway {
     kPurge,
     kRestart,
     kFetch,
-    kDeliver
+    kDeliver,
+    _kLast    //dummy item to get the number of items
+    // !! Don't insert any item after _kLast
   };
+  */
 
 
 
   /**
    * The definition of different stages during the request's journey from admission 
    * into the proxy to departure from it and head to the client.
-   * Corresponding to each stage, an `Archway::Function` can be defined to
+   * Corresponding to each stage, an `Archway::DynamicFunction` can be defined to
    * catch the request or response and processes it.
   */
   enum class Stage {
-    kInvalid,
+    kStart,
     kReceive,
     kPipe,
     kPass,
@@ -54,12 +58,13 @@ namespace archway {
     kBackendResponse,
     kBackendError,
     kDeliver,
+    kEnd,
     _kLast    //dummy item to get the number of items
     // !! Don't insert any item after _kLast
   };
 
   enum class ParamID {
-    kAction,
+    kStage,   // The next stage which is proposed by staged functions
     kBackendIndex
   };
 
@@ -78,7 +83,7 @@ namespace archway {
    * The archway umbrella data structure which holds request or response,
    *  along with a map containing archway-specific parameters.
    * The parameters can be numeric or string, thanks to std::variant.
-   * This structure will pass to all Function objects.
+   * This structure will pass to all DynamicFunction objects.
   */ 
   class Message {
 
@@ -86,16 +91,36 @@ namespace archway {
       
       Message() = delete;
 
+      
+      /**
+       * The initial constructor.
+       * In the initial stages of the routing process we deal with
+       *  request, so firstly we create a Message bearing the Request.
+      */
       Message( const drogon::HttpRequestPtr& in_request) :
         req_resp_(in_request) {
-
+        
+        params_.emplace(ParamID::kStage, static_cast<int>(Stage::kStart));
       }
 
-      Message( const drogon::HttpResponsePtr& in_response) :
+      
+      /**
+       * Converting constructor.
+       * After kBackendFetch stage, we need to put the fetched response
+       *  from backend into the message, so here we construct a copy of
+       *  input Message, which bears a Response object from now on.
+      */
+      Message( 
+        const Message& in_message,
+        const drogon::HttpResponsePtr& in_response
+      ) :
         req_resp_(in_response) {
-
+        
+        params_ = in_message.params_;
       }
 
+      
+      
       drogon::HttpRequestPtr Request() {
 
         auto the_ptr = std::get_if<drogon::HttpRequestPtr>(&req_resp_);
@@ -118,6 +143,11 @@ namespace archway {
           return nullptr;
 
         }
+      }
+
+
+      std::shared_ptr<HostProgram> &host_program() {
+        return host_program_;
       }
 
 
@@ -203,6 +233,7 @@ namespace archway {
     private:
 
       RequestResponsePtr req_resp_;
+      std::shared_ptr<HostProgram> host_program_;
       std::unordered_map<ParamID, IntString> params_;
 
   };

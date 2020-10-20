@@ -9,6 +9,7 @@
 #include "../archway/node_processor.h"
 #include "../archway/root_node_processor.h"
 #include "../archway/archway.h"
+#include "../archway/host_program.h"
 #include "../archway/compiler.h"
 
 
@@ -83,13 +84,14 @@ TEST(Archway_Skeleton_Test, string_utils) {
 
   const std::string the_string{"*.example.com"};
 
-  std::vector<std::string> the_tokens = archway::StringUtils::SplitString(the_string, '.');
-  EXPECT_EQ( the_tokens.size(), 3);
-  EXPECT_EQ( the_tokens[0], "*");
-  EXPECT_EQ( the_tokens[1], "example");
-  EXPECT_EQ( the_tokens[2], "com");
+  auto the_normalized_str = archway::StringUtils::NormalizeWildcard(the_string);
 
-  std::string the_inverted_string = archway::StringUtils::InvertHostName(the_string);
+  std::vector<std::string> the_tokens = archway::StringUtils::SplitString(the_normalized_str, '.');
+  EXPECT_EQ( the_tokens.size(), 2);
+  EXPECT_EQ( the_tokens[0], "example");
+  EXPECT_EQ( the_tokens[1], "com");
+
+  std::string the_inverted_string = archway::StringUtils::InvertHostName(the_normalized_str);
   EXPECT_EQ( the_inverted_string, "com.example");
 }
 
@@ -131,9 +133,19 @@ TEST(Archway_Skeleton_Test, wildcard_playground)  {
     " The candidate value: " << the_value << "\n"
   ;
   
-  
-  
-  
+}
+
+
+TEST(Archway_Skeleton_Test, router) {
+
+  archway::Archway  the_archway;
+  auto  the_host_program = std::make_shared<archway::HostProgram>();
+  std::vector<std::string> the_host_names{"*.example.com", "*.think.com"};
+  the_archway.AddHostProgram(the_host_names, the_host_program);
+
+  auto the_found_program = the_archway.FindHostProgram("www.example.com");
+  EXPECT_NE( the_found_program, nullptr);
+  EXPECT_EQ( the_found_program, the_host_program);
 }
 
 

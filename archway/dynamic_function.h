@@ -1,6 +1,6 @@
 /**
  *
- *  function.h
+ *  dynamic_function.h
  * 
  *  Archway subroutine container
  *
@@ -11,23 +11,24 @@
 #include <vector>
 #include <functional>
 #include "archway_types.h"
+#include "utils/expected.h"
 
 
 namespace archway
 {
   
   using Instruction = 
-    std::function<Action( Message &)>
+    std::function<Expected<void>(Message&)>
   ;  
 
   /**
    * A sequence of Instructions
-   */ 
-  class Function {
+  */ 
+  class DynamicFunction {
 
     public:
 
-    Function() {
+    DynamicFunction() {
 
     }
 
@@ -35,7 +36,8 @@ namespace archway
       instructions_.emplace_back(in_instruction);
     }
 
-    Action Run( Message &);
+    
+    Expected<void> Run( Message &);
 
     private:
 

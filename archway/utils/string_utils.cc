@@ -43,10 +43,10 @@ std::string StringUtils::InvertHostName( const std::string& in_host_name) {
   ) {
 
     std::string the_token = *the_r_iter;
-    if( the_token == "*" ) continue;
+    // if( the_token == "*" ) continue;   // We assume the input string was normalized!
 
     the_stream << the_token;
-    if( *(next(the_r_iter)) != "*" ) {
+    if( next(the_r_iter) != the_tokens.rend() ) {
       the_stream << '.';
     }
 

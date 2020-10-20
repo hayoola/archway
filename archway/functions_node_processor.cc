@@ -8,7 +8,7 @@
 
 #include "functions_node_processor.h"
 #include "host_program.h"
-#include "function.h"
+#include "dynamic_function.h"
 
 
 using namespace archway;
@@ -51,7 +51,7 @@ int FunctionsNodeProcessor::ProcessNode(
       }
 
       Stage the_stage = HostProgram::StringToStage( the_stage_name);
-      if( the_stage == Stage::kInvalid ) {
+      if( the_stage == Stage::kStart ) {
         the_result = -5;
         break;
       }
@@ -65,7 +65,7 @@ int FunctionsNodeProcessor::ProcessNode(
 
       // Create a function as the encompassing context of Instructions and 
       //  add it to the passed 'HostProgram' (as in_context)
-      auto the_function_ptr = std::make_shared<Function>();
+      auto the_function_ptr = std::make_shared<DynamicFunction>();
       the_host_program_ptr->SetFunctionForStage(the_function_ptr, the_stage);
 
       // Now Let's iterate over the instructions
@@ -96,7 +96,7 @@ int FunctionsNodeProcessor::ProcessNode(
         the_result = the_processor->ProcessNode(
           the_single_instruction_node,
           archway,
-          the_function_ptr  // Pass the newly constructed `Function` as the context
+          the_function_ptr  // Pass the newly constructed `DynamicFunction` as the context
         );
 
       }

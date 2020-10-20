@@ -4,15 +4,15 @@
  *
 */
 
-#include "function.h"
+#include "dynamic_function.h"
 
 
 using namespace drogon;
 using namespace archway;
 
-Action Function::Run( Message & in_message) {
+Expected<void> DynamicFunction::Run( Message & in_message) {
 
-  Action the_result{Action::kInvalid};
+  Expected<void> the_result{};
 
   for( auto the_iter = instructions_.begin(); the_iter != instructions_.end(); the_iter++ ) {
     the_result = (*the_iter)(in_message);

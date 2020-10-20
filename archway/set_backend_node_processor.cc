@@ -8,7 +8,7 @@
 
 #include "set_backend_node_processor.h"
 #include "set_backend_instruction.h"
-#include "function.h"
+#include "dynamic_function.h"
 
 
 using namespace archway;
@@ -25,7 +25,7 @@ int SetBackendNodeProcessor::ProcessNode(
   do {
 
     
-    auto the_function_ptr = std::any_cast<std::shared_ptr<Function>>(in_context);
+    auto the_function_ptr = std::any_cast<std::shared_ptr<DynamicFunction>>(in_context);
     if( ! the_function_ptr ) {
       the_result = -1;
       break;

@@ -10,6 +10,7 @@
 #include <drogon/HttpRequest.h>
 #include "archway_types.h"
 #include "initable.h"
+#include "utils/expected.h"
 
 
 
@@ -30,11 +31,11 @@ namespace archway {
 
       }
 
-      Action operator () (Message& in_message) {
+      Expected<void> operator () (Message& in_message) {
         return processRequest(in_message);
       }
 
-      Action processRequest(Message &);
+      Expected<void> processRequest(Message &);
 
     private:
       int backend_index_;

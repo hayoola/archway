@@ -53,10 +53,10 @@ TEST(Archway_Message_Test, Set_Get_String) {
 
     drogon::HttpRequestPtr  the_request;
     Message the_message(the_request);
-    std::string the_str_value{"hayoola!"};
-    the_message.SetParam(ParamID::kAction, the_str_value);
-    EXPECT_EQ( the_message.StringParam(ParamID::kAction), the_str_value);
-    EXPECT_EQ( the_message.IntParam(ParamID::kAction), -1);
+    Stage the_stage{Stage::kEnd};
+    the_message.SetParam(ParamID::kStage, static_cast<int>(the_stage));
+    EXPECT_EQ( the_message.StringParam(ParamID::kStage), "");
+    EXPECT_EQ( the_message.IntParam(ParamID::kStage), static_cast<int>(the_stage));
 
   } catch( const std::exception& in_error ) {
 

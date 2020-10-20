@@ -74,6 +74,13 @@ namespace archway {
         router_.AddHostProgram(in_host_names, in_host_program);
       }
 
+
+      std::shared_ptr<HostProgram> FindHostProgram(
+        const std::string& in_host_name
+      ) {
+        return router_.FindHostProgram(in_host_name);
+      }
+
       
 
     private:

@@ -41,6 +41,13 @@ namespace archway {
     );
 
 
+    static std::string NormalizeWildcard(
+      const std::string& in_string
+    ) {
+      return in_string.substr(2);
+    }
+
+
     static std::string InvertHostName( const std::string& in_host_name);
   
   };
