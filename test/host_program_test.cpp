@@ -7,6 +7,8 @@
 
 using namespace archway;
 
+static const std::string s_error_string{"Fatal error! Move away ASAP!"};
+
 struct DummyInstruction {
 
   Expected<void> operator () ( Message& in_message) {
@@ -18,7 +20,7 @@ struct DummyInstruction {
 struct FailingInstruction {
 
   Expected<void> operator () ( Message& in_message) {
-    return std::logic_error("Fatal error! Move away ASAP!");
+    return std::logic_error(s_error_string);
   }
 };
 
@@ -84,11 +86,20 @@ TEST(Archway_HostProgram_Test, Construction_Dynamic_Failing) {
       auto the_result = the_stage_func->Run(the_message);
 
       EXPECT_TRUE(!the_result.wasSuccessful());
+      EXPECT_EQ(the_result.error(), s_error_string);
 
-      std::logic_error the_logic_err("This is a logic error!");
-      std::cout << "\nThe error: " << the_logic_err.what() << "\n";
+      //std::logic_error the_logic_err("This is a logic error!");
+      //std::cout << "\nThe error: " << the_result.error() << "\n";
       
-      
+      Expected<int> the_int_expected(-657);
+      EXPECT_TRUE(the_int_expected.isValid());
+      EXPECT_EQ(the_int_expected.get(), -657);
+
+      const std::string the_error_string{"A typical logic error"};
+      std::logic_error the_hayoola(the_error_string);
+      Expected<int> the_failing_expected(the_hayoola);
+      EXPECT_FALSE(the_failing_expected.isValid());
+      EXPECT_EQ(the_failing_expected.error(), the_error_string);
     }
     
 
