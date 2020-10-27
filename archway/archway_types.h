@@ -65,7 +65,13 @@ namespace archway {
 
   enum class ParamID {
     kStage,   // The next stage which is proposed by staged functions
-    kBackendIndex
+    kRouterPtr,
+    kBackendIndex,
+    kHostProgram,
+    kCallbackFunction,
+    kFetchStatus,
+    _kLast
+    // !! Don't insert any item after _kLast
   };
 
   using RequestResponsePtr = std::variant<
@@ -73,16 +79,12 @@ namespace archway {
     drogon::HttpResponsePtr
   >;
 
-  using IntString = std::variant<
-    int,
-    std::string
-  >;
 
   
   /**
    * The archway umbrella data structure which holds request or response,
-   *  along with a map containing archway-specific parameters.
-   * The parameters can be numeric or string, thanks to std::variant.
+   *  along with a vector containing archway-specific parameters.
+   * The parameters can be anything, thanks to std::any.
    * This structure will pass to all DynamicFunction objects.
   */ 
   class Message {
@@ -100,7 +102,8 @@ namespace archway {
       Message( const drogon::HttpRequestPtr& in_request) :
         req_resp_(in_request) {
         
-        params_.emplace(ParamID::kStage, static_cast<int>(Stage::kStart));
+        params_.resize(static_cast<size_t>(ParamID::_kLast));
+        
       }
 
       
@@ -111,12 +114,12 @@ namespace archway {
        *  input Message, which bears a Response object from now on.
       */
       Message( 
-        const Message& in_message,
+        const std::shared_ptr<Message>& in_message,
         const drogon::HttpResponsePtr& in_response
       ) :
         req_resp_(in_response) {
         
-        params_ = in_message.params_;
+        params_ = in_message->params_;
       }
 
       
@@ -146,96 +149,16 @@ namespace archway {
       }
 
 
-      std::shared_ptr<HostProgram> &host_program() {
-        return host_program_;
-      }
-
-
-      /**
-       * The string version. 
-       * Add or update the param designated by the input id
-       * @param in_id The numeric id of the param
-       * @param in_data The textual value of the param
-      */
-      void SetParam(
-        ParamID in_id,
-        const std::string& in_data
-      ) {
-
-        auto the_iter = params_.find(in_id);
-        if( the_iter != params_.end()) {
-          the_iter->second = in_data;
-
-        } else {
-          params_.emplace(in_id, in_data);
-
-        }
-      }
-
-
-      /**
-       * The numeric version. 
-       * 
-       * Add or update the param designated by the input id
-       * @param in_id The numeric id of the param
-       * @param in_data The numeric value of the param
-      */
-      void SetParam(
-        ParamID in_id,
-        const int in_data
-      ) {
-
-        auto the_iter = params_.find(in_id);
-        if( the_iter != params_.end()) {
-          the_iter->second = in_data;
-
-        } else {
-          params_.emplace(in_id, in_data);
-
-        }
-      }
-
       
-      std::string StringParam( ParamID in_id ) {
-
-        std::string the_param{""};
-
-        auto the_iter = params_.find(in_id);
-        if( the_iter != params_.end() ) {
-          
-          auto the_ptr = std::get_if<std::string>(&(the_iter->second));
-          if( the_ptr ) {
-            the_param = *the_ptr;
-          }
-        }
-
-        return the_param;
+      std::any& parameter( ParamID in_id) {
+        return params_.at(static_cast<size_t>(in_id));
       }
 
-
-      
-      int IntParam( ParamID in_id ) {
-
-        int the_param{-1};
-
-        auto the_iter = params_.find(in_id);
-        if( the_iter != params_.end() ) {
-
-          auto the_ptr = std::get_if<int>(&(the_iter->second));
-          if( the_ptr ) {
-            the_param = *the_ptr;
-          }
-        }
-
-        return the_param;
-      }
 
     private:
 
       RequestResponsePtr req_resp_;
-      std::shared_ptr<HostProgram> host_program_;
-      std::unordered_map<ParamID, IntString> params_;
-
+      std::vector<std::any> params_;
   };
 
 }

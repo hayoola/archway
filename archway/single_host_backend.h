@@ -23,6 +23,11 @@ namespace archway {
 
       int HandleEvent( const Event& in_event) override;
 
+      virtual Expected<void> Fetch(
+        std::shared_ptr<Message> & in_message,
+        std::function<Expected<void>(std::shared_ptr<Message>&)> did_fetch_callback
+      ) override;
+
     private:
       const std::string host_address_;
 

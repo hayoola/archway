@@ -5,7 +5,7 @@
  * Functional error and exception handling based on the talk:
  *  C++ and Beyond 2012: Systematic Error Handling in C++, Andrei Alexandrescu
  *  
- * I decided to not store the std::excpetion inside this object, because the what()
+ * I decided to not store the std::excpetion inside this object, because the `what()`
  *  string will get lost, and it is quite expensive to infer the type of 
  *  an excpetion during runtime. So I just store the result of what()
  * 
@@ -21,6 +21,34 @@
 #include <atomic>
 
 namespace archway {
+
+
+  /**
+   * Through this class we can recored more detailed info
+   *  about the compilation error, like where().
+   * Then via a specialized constructor in the `Expected` object
+   *  we can access these info and ...!
+  */
+  class CompileError : public std::logic_error {
+
+    public:
+
+      CompileError(const std::string& in_description) :
+      std::logic_error(in_description) {
+
+      }
+  };
+
+  
+  class RoutingError : public std::logic_error {
+
+    public:
+      
+      RoutingError(const std::string& in_description) :
+      std::logic_error(in_description) {
+      
+      }
+  };
 	
 	template<class T>
 	class Expected {
@@ -66,9 +94,24 @@ namespace archway {
       ~Expected() {}
 
       // creating expect from exceptions
+      
       Expected<T>(std::exception const& e) : 
       error_(e.what()), gotResult_(false) { 
 
+      }
+
+      
+      Expected<T>(CompileError const& e) : 
+      error_(e.what()), gotResult_(false) { 
+
+        // TODO: Extract and store specialized info, like where()
+      }
+
+
+      Expected<T>(RoutingError const& e) : 
+      error_(e.what()), gotResult_(false) { 
+
+        // TODO: Extract and store specialized info, like where()
       }
 
       // operator overload
@@ -121,8 +164,24 @@ namespace archway {
 	public:
 		
     // constructors and destructor
-		Expected(const std::exception& e) : error_(e.what()), gotResult_(false) {
+		
+    Expected(const std::exception& e) : 
+    error_(e.what()), gotResult_(false) {
       
+    }
+
+
+    Expected(const CompileError& e) : 
+    error_(e.what()), gotResult_(false) {
+      
+      //TODO: Record specialized info
+    }
+
+
+    Expected(const RoutingError& e) : 
+    error_(e.what()), gotResult_(false) {
+      
+      //TODO: Record specialized info
     }
 		
     template<typename T>

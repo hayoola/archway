@@ -31,11 +31,11 @@ namespace archway {
 
       }
 
-      Expected<void> operator () (Message& in_message) {
+      Expected<void> operator () (std::shared_ptr<Message>& in_message) {
         return processRequest(in_message);
       }
 
-      Expected<void> processRequest(Message &);
+      Expected<void> processRequest(std::shared_ptr<Message>&);
 
     private:
       int backend_index_;

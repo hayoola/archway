@@ -11,7 +11,7 @@ static const std::string s_error_string{"Fatal error! Move away ASAP!"};
 
 struct DummyInstruction {
 
-  Expected<void> operator () ( Message& in_message) {
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
     return {};
   }
 };
@@ -19,8 +19,8 @@ struct DummyInstruction {
 
 struct FailingInstruction {
 
-  Expected<void> operator () ( Message& in_message) {
-    return std::logic_error(s_error_string);
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
+    return RoutingError(s_error_string);
   }
 };
 
@@ -45,7 +45,7 @@ TEST(Archway_HostProgram_Test, Construction_Dynamic) {
     } else {
 
       drogon::HttpRequestPtr  the_request;
-      Message the_message(the_request);
+      auto the_message = std::make_shared<Message>(the_request);
       auto the_result = the_stage_func->Run(the_message);
 
       EXPECT_TRUE(the_result.wasSuccessful());
@@ -70,7 +70,7 @@ TEST(Archway_HostProgram_Test, Construction_Dynamic_Failing) {
 
     
     Instruction the_instruction = FailingInstruction();
-    std::shared_ptr<DynamicFunction> the_function_ptr = std::make_shared<DynamicFunction>();
+    auto the_function_ptr = std::make_shared<DynamicFunction>();
     the_function_ptr->AddInstruction(the_instruction);
     HostProgram the_host_program;
     the_host_program.SetFunctionForStage(the_function_ptr, Stage::kReceive);
@@ -82,22 +82,19 @@ TEST(Archway_HostProgram_Test, Construction_Dynamic_Failing) {
     } else {
 
       drogon::HttpRequestPtr  the_request;
-      Message the_message(the_request);
+      auto the_message = std::make_shared<Message>(the_request);
       auto the_result = the_stage_func->Run(the_message);
 
-      EXPECT_TRUE(!the_result.wasSuccessful());
+      EXPECT_FALSE(the_result.wasSuccessful());
       EXPECT_EQ(the_result.error(), s_error_string);
 
-      //std::logic_error the_logic_err("This is a logic error!");
-      //std::cout << "\nThe error: " << the_result.error() << "\n";
-      
       Expected<int> the_int_expected(-657);
       EXPECT_TRUE(the_int_expected.isValid());
       EXPECT_EQ(the_int_expected.get(), -657);
 
-      const std::string the_error_string{"A typical logic error"};
-      std::logic_error the_hayoola(the_error_string);
-      Expected<int> the_failing_expected(the_hayoola);
+      const std::string the_error_string{"A typical compile error"};
+      CompileError the_error_object(the_error_string);
+      Expected<int> the_failing_expected(the_error_object);
       EXPECT_FALSE(the_failing_expected.isValid());
       EXPECT_EQ(the_failing_expected.error(), the_error_string);
     }
@@ -119,7 +116,7 @@ TEST(Archway_HostProgram_Test, Construction_Static) {
 
     HostProgram the_host_program;
     the_host_program.SetFunctionForStage(
-      [] (Message& ) -> Expected<void>{
+      [] (std::shared_ptr<Message>& ) -> Expected<void>{
         return {};
       },
       Stage::kReceive
@@ -134,7 +131,7 @@ TEST(Archway_HostProgram_Test, Construction_Static) {
     } else {
 
       drogon::HttpRequestPtr  the_request;
-      Message the_message(the_request);
+      auto the_message = std::make_shared<Message>(the_request);
       auto the_result = the_stage_function( the_message);
       EXPECT_TRUE(the_result.wasSuccessful());
     }

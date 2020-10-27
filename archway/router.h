@@ -15,7 +15,7 @@
 
 namespace archway {
 
-  class Router {
+  class Router : public std::enable_shared_from_this<Router> {
 
     public:
 
@@ -31,7 +31,7 @@ namespace archway {
 
       Expected<void> Route(const drogon::HttpRequestPtr& in_request);
 
-      Expected<void> MoveToNextState(Message& in_message);
+      Expected<void> MoveToNextState(std::shared_ptr<Message>& in_message);
 
 
     private:

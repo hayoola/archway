@@ -16,14 +16,94 @@ using namespace archway;
 
 struct ReceiveRequestHandler {
 
-  Expected<void> operator () ( Message& in_message) {
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
     
     Expected<void> the_result{};
+
+    do {
+
+      auto the_host_program = std::any_cast<std::shared_ptr<HostProgram>> (
+        in_message->parameter(ParamID::kHostProgram)
+      );
+
+      if( ! the_host_program ) {
+        the_result = RoutingError("The Message doesn't bear 'host_program' param!");
+        break;
+      }
+      
+      auto the_dynamic_receive_request_func = the_host_program->
+        GetDynamicFunctionForStage(Stage::kReceive)
+      ;
+
+      // We set the default next stage, but the dynamic function can override
+      //?? In the initial version we don't have 'cache', so we just 
+      //??  turn to the 'Fetch' stage!
+      in_message->parameter(ParamID::kStage) = Stage::kBackendFetch;
+      
+      if( the_dynamic_receive_request_func ) {
+        the_result = the_dynamic_receive_request_func->Run(in_message);
+      }
+
+
+      auto the_router = std::any_cast<std::shared_ptr<Router>> (
+        in_message->parameter(ParamID::kRouterPtr)
+      );
+      
+      if( ! the_router ) {
+        the_result = RoutingError("There is not a pointer to the Router inside in_message!");
+        break;
+      }
+
+      the_result = the_router->MoveToNextState(in_message);
+
+
+    } while( false );
+    
     
     return the_result;
   }
 
 };
+
+
+
+
+struct FetchResponseHandler {
+
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
+
+    Expected<void> the_result{};
+
+    do {
+
+      auto the_host_program = std::any_cast<std::shared_ptr<HostProgram>> (
+        in_message->parameter(ParamID::kHostProgram)
+      );
+
+      if( ! the_host_program ) {
+        the_result = RoutingError("The Message doesn't bear 'host_program' param!");
+        break;
+      }
+
+      // Now we should create a drogon HttpClient and hand over the request
+      // These are the questions:
+      //  Where should I store the ClientPtr? In a thread-local storage?
+      //    -> Yes, of course! We should put them in a `drogon::IOThreadStorage`
+      //        data member!
+      //  When should I initialize the thread-local storage?
+      //    -> Well, the Archway and all of its related objects would be 
+      //        initialized during the drogon plugin's `initAndStart` method
+      //        so the Router's constructor looks like a proper place for
+      //        initializing the `drogon::IOThreadStorage` data members
+
+    } while( false );
+
+    return the_result;
+  }
+
+};
+
+
 
 
 Router::Router() : 
@@ -54,14 +134,22 @@ Expected<void> Router::Route(
 
   if( the_host_program ) {
 
-    Message the_message(in_request);
-    the_message.host_program() = the_host_program;
+    //Message the_message(in_request);
+    auto the_message = std::make_shared<Message>(in_request);
+    the_message->parameter(ParamID::kHostProgram) = the_host_program;
+    
+    // We store a pointer to the Router for static functions to call 
+    //  its `MoveToNextStage` method
+    the_message->parameter(ParamID::kRouterPtr) = shared_from_this();
+    
+    // Before the call to `MoveToNextStage` we should set the next stage!
+    the_message->parameter(ParamID::kStage) = Stage::kReceive;
     the_result = MoveToNextState( the_message);
   
   } {
 
     // The compiler shouldn't allow a configuration without any host_program
-    the_result = std::runtime_error("There is no default host program!");
+    the_result = RoutingError("There is no default host program!");
 
   }
 
@@ -72,16 +160,47 @@ Expected<void> Router::Route(
 
 
 Expected<void> Router::MoveToNextState(
-  Message& in_message
+  std::shared_ptr<Message>& in_message
 ) {
 
-  // auto the_function = build_in_stage_functions_.GetStaticFunctionForStage(
-  //  in_message.IntParam(ParamID::kStage));
-  // Maybe we need a dedicated Message::stage() accessor function
-  //  in_message.stage() = the_default_next_stage;
-  //  int the_function();
+  Expected<void> the_result{};  // A successful Expected<void>
 
-  return {};
+  do {
+
+    auto the_next_stage = std::any_cast<Stage>(in_message->parameter(ParamID::kStage));
+    if( the_next_stage == Stage::kStart ) {
+      the_result = RoutingError("We can't be at the starting stage in MoveToNextStage!");
+    }
+
+    if( the_next_stage == Stage::kEnd) {
+      break;
+    }
+
+    if( the_next_stage < Stage::kStart &&
+        the_next_stage > Stage::kEnd
+    ) {
+      the_result = RoutingError("The next stage is invalid! " + 
+        static_cast<int>(the_next_stage)
+      );
+      break;
+    }
+    
+    auto the_function = build_in_stage_functions_.GetStaticFunctionForStage(
+      static_cast<Stage>(the_next_stage)
+    );
+    
+    if(! the_function ) {
+      the_result = RoutingError("There is no static function for stage: " + 
+        static_cast<int>(the_next_stage)
+      );
+    }
+
+    the_result = the_function(in_message);  // The function will set the next after the next stage!
+
+
+  } while( false );
+
+  return the_result;
 
 }
 

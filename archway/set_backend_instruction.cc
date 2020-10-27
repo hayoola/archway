@@ -20,10 +20,10 @@ using namespace archway;
  *  so the Router knows what to do
 */
 Expected<void> SetBackendInstruction::processRequest(
-  Message& in_message) {
+  std::shared_ptr<Message>& in_message) {
 
   LOG_DEBUG << "SetBackend Instruction...";
-  in_message.SetParam(ParamID::kBackendIndex, backend_index_);
+  in_message->parameter(ParamID::kBackendIndex) = backend_index_;
 
   return {};
 

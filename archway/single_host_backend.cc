@@ -33,3 +33,13 @@ int SingleHostBackend::HandleEvent(
 
   return 0;
 }
+
+
+
+Expected<void> SingleHostBackend::Fetch(
+  std::shared_ptr<Message> & in_message,
+  std::function<Expected<void>(std::shared_ptr<Message>&)> did_fetch_callback
+) {
+
+  return {};
+}

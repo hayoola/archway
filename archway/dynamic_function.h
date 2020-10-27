@@ -18,7 +18,7 @@ namespace archway
 {
   
   using Instruction = 
-    std::function<Expected<void>(Message&)>
+    std::function<Expected<void>(std::shared_ptr<Message>&)>
   ;  
 
   /**
@@ -37,7 +37,7 @@ namespace archway
     }
 
     
-    Expected<void> Run( Message &);
+    Expected<void> Run( std::shared_ptr<Message> &);
 
     private:
 

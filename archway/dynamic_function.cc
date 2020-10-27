@@ -10,7 +10,7 @@
 using namespace drogon;
 using namespace archway;
 
-Expected<void> DynamicFunction::Run( Message & in_message) {
+Expected<void> DynamicFunction::Run( std::shared_ptr<Message>& in_message) {
 
   Expected<void> the_result{};
 

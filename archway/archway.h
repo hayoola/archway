@@ -19,12 +19,17 @@
 
 namespace archway {
 
-  class Archway {
+  class Archway : public std::enable_shared_from_this<Archway> {
 
     public:
 
       Archway();
 
+      
+      std::shared_ptr<Archway> shared_ptr() {
+        return shared_from_this();
+      }
+      
       void AddBackend(const std::shared_ptr<Backend> in_backend) {
         
         // In order to make the life for `Compiler` and ourselves easier,

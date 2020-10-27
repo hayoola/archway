@@ -24,7 +24,7 @@ namespace archway {
   */
   using FunctionPtr = std::variant<
     std::shared_ptr<DynamicFunction>,
-    std::function<Expected<void>(Message&)>
+    std::function<Expected<void>(std::shared_ptr<Message>&)>
   >;
 
   class HostProgram {
@@ -42,7 +42,7 @@ namespace archway {
 
       HostProgram(
         const std::array<
-          std::function<Expected<void>(Message&)>, 
+          std::function<Expected<void>(std::shared_ptr<Message>&)>, 
           static_cast<size_t>(Stage::_kLast)
         >& in_functions
       ) {
@@ -68,7 +68,7 @@ namespace archway {
        * The static build-in function version
       */
       void SetFunctionForStage(
-        const std::function<Expected<void>(Message&)> in_function,
+        const std::function<Expected<void>(std::shared_ptr<Message>&)> in_function,
         const Stage in_stage
       ) {
         stage_functions_[static_cast<size_t>(in_stage)] = in_function;
@@ -94,14 +94,14 @@ namespace archway {
 
 
 
-      std::function<Expected<void>(Message&)> 
+      std::function<Expected<void>(std::shared_ptr<Message>&)> 
       GetStaticFunctionForStage(const Stage in_stage) {
         
-        std::function<Expected<void>(Message&)> the_result{nullptr};
+        std::function<Expected<void>(std::shared_ptr<Message>&)> the_result{nullptr};
 
         auto the_generic_ptr = stage_functions_[static_cast<size_t>(in_stage)];
         auto the_dynamic_func_ptr = 
-          std::get_if< std::function<Expected<void>(Message&)>  >(&the_generic_ptr)
+          std::get_if< std::function<Expected<void>(std::shared_ptr<Message>&)>  >(&the_generic_ptr)
         ;
         
         if( the_dynamic_func_ptr ) {
