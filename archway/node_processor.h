@@ -60,7 +60,7 @@ namespace archway {
        *  which is registered to process 'node_name'.
        * In conformance to C++ core guideline we won't use the singleton
        *  pattern anymore, because of that the returned instance is 
-       *  protected by <unique_ptr> so it will be self-destructed
+       *  protected by <shared_ptr> so it will be self-destructed
        * @param node_name The registered YAML node name
        * @return A generic unique pointer of the NodeProcessor object 
        *  (non-constant for enabling the caller to take the ownership)

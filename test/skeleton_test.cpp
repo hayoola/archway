@@ -136,17 +136,7 @@ TEST(Archway_Skeleton_Test, wildcard_playground)  {
 }
 
 
-TEST(Archway_Skeleton_Test, router) {
 
-  archway::Archway  the_archway;
-  auto  the_host_program = std::make_shared<archway::HostProgram>();
-  std::vector<std::string> the_host_names{"*.example.com", "*.think.com"};
-  the_archway.AddHostProgram(the_host_names, the_host_program);
-
-  auto the_found_program = the_archway.FindHostProgram("www.example.com");
-  EXPECT_NE( the_found_program, nullptr);
-  EXPECT_EQ( the_found_program, the_host_program);
-}
 
 
 TEST(Archway_Skeleton_Test, is_valid) {

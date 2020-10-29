@@ -15,11 +15,17 @@ add_executable(
 )
 
 
+add_executable(
+  router_test_unittest router_test.cpp
+)
+
+
 
 set(UNITTEST_TARGETS
   skeleton_test_unittest
   message_test_unittest
   host_program_test_unittest
+  router_test_unittest
 )
 
 # Since archway NodeProcessor objects register themselves durng

@@ -23,7 +23,7 @@ struct ReceiveRequestHandler {
     do {
 
       auto the_host_program = std::any_cast<std::shared_ptr<HostProgram>> (
-        in_message->parameter(ParamID::kHostProgram)
+        &(in_message->parameter(ParamID::kHostProgram))   // Use pointer any_cast to not throw!
       );
 
       if( ! the_host_program ) {
@@ -31,22 +31,35 @@ struct ReceiveRequestHandler {
         break;
       }
       
-      auto the_dynamic_receive_request_func = the_host_program->
-        GetDynamicFunctionForStage(Stage::kReceive)
-      ;
 
       // We set the default next stage, but the dynamic function can override
       //?? In the initial version we don't have 'cache', so we just 
       //??  turn to the 'Fetch' stage!
       in_message->parameter(ParamID::kStage) = Stage::kBackendFetch;
       
+      
+      auto the_dynamic_receive_request_func = (*the_host_program)->
+        GetDynamicFunctionForStage(Stage::kReceive)
+      ;
+
       if( the_dynamic_receive_request_func ) {
         the_result = the_dynamic_receive_request_func->Run(in_message);
       }
 
 
+      // Check to see whether the dynamic function set a backend or not
+      auto the_backend_idx_ptr = std::any_cast<int> (
+        &(in_message->parameter(ParamID::kBackendIndex))   // Use pointer any_cast to not throw!
+      );
+
+      int the_backend_idx = 0;  // The default backend is the first one
+      if( the_backend_idx_ptr ) {
+        the_backend_idx = *the_backend_idx_ptr;
+      }
+
+
       auto the_router = std::any_cast<std::shared_ptr<Router>> (
-        in_message->parameter(ParamID::kRouterPtr)
+        &(in_message->parameter(ParamID::kRouterPtr))
       );
       
       if( ! the_router ) {
@@ -54,7 +67,7 @@ struct ReceiveRequestHandler {
         break;
       }
 
-      the_result = the_router->MoveToNextState(in_message);
+      the_result = (*the_router)->MoveToNextState(in_message);
 
 
     } while( false );
@@ -85,6 +98,8 @@ struct FetchResponseHandler {
         break;
       }
 
+
+
       // Now we should create a drogon HttpClient and hand over the request
       // These are the questions:
       //  Where should I store the ClientPtr? In a thread-local storage?
@@ -96,6 +111,56 @@ struct FetchResponseHandler {
       //        so the Router's constructor looks like a proper place for
       //        initializing the `drogon::IOThreadStorage` data members
 
+      
+      // Inside the callback function:
+      {
+        // We set the next stage, based on the result of the Fetch proccess
+        //TODO: Change this NOT to always OK!
+        // in_message->parameter(ParamID::kStage) = Stage::kBackendResponse;
+
+        /*
+        auto the_router = std::any_cast<std::shared_ptr<Router>> (
+          &(in_message->parameter(ParamID::kRouterPtr))
+        );
+
+        if( ! the_router ) {
+          the_result = RoutingError("There is not a pointer to the Router inside in_message!");
+          break;
+        }
+
+        the_result = (*the_router)->MoveToNextState(in_message);
+        */
+      }
+
+
+    } while( false );
+
+    return the_result;
+  }
+
+};
+
+
+
+struct BackendResponseHandler {
+
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
+
+    Expected<void> the_result{};
+
+    do {
+
+      auto the_host_program = std::any_cast<std::shared_ptr<HostProgram>> (
+        in_message->parameter(ParamID::kHostProgram)
+      );
+
+      if( ! the_host_program ) {
+        the_result = RoutingError("The Message doesn't bear 'host_program' param!");
+        break;
+      }
+
+
+
     } while( false );
 
     return the_result;
@@ -106,12 +171,71 @@ struct FetchResponseHandler {
 
 
 
+struct BackendErrorHandler {
+
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
+
+    Expected<void> the_result{};
+
+    do {
+
+      auto the_host_program = std::any_cast<std::shared_ptr<HostProgram>> (
+        in_message->parameter(ParamID::kHostProgram)
+      );
+
+      if( ! the_host_program ) {
+        the_result = RoutingError("The Message doesn't bear 'host_program' param!");
+        break;
+      }
+
+    } while( false );
+
+    return the_result;
+
+  }
+
+};
+
+
+
+
+struct DeliverResponseHandler {
+
+  Expected<void> operator () ( std::shared_ptr<Message>& in_message) {
+
+    Expected<void> the_result{};
+
+    do {
+
+      auto the_host_program = std::any_cast<std::shared_ptr<HostProgram>> (
+        in_message->parameter(ParamID::kHostProgram)
+      );
+
+      if( ! the_host_program ) {
+        the_result = RoutingError("The Message doesn't bear 'host_program' param!");
+        break;
+      }
+
+
+    } while( false );
+
+    return the_result;
+
+  }
+
+};
+
+
+
+
 Router::Router() : 
 default_host_program_(nullptr) {
+
 
   // Initialize `build_in_stage_functions_` with function objects
   //  that are defined in this file
   build_in_stage_functions_.SetFunctionForStage( ReceiveRequestHandler(), Stage::kReceive);
+  build_in_stage_functions_.SetFunctionForStage( FetchResponseHandler(), Stage::kBackendFetch);
 
 }
 
@@ -146,7 +270,7 @@ Expected<void> Router::Route(
     the_message->parameter(ParamID::kStage) = Stage::kReceive;
     the_result = MoveToNextState( the_message);
   
-  } {
+  } else {
 
     // The compiler shouldn't allow a configuration without any host_program
     the_result = RoutingError("There is no default host program!");
