@@ -11,9 +11,9 @@ using namespace archway;
 
 
 
-Archway::Archway() {
+Archway::Archway( std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory ) {
 
-  int dummy{-1};
+  router_ = std::make_shared<Router>(in_http_client_factory);
   
 
 }

@@ -56,7 +56,14 @@ set_property(TARGET ${UNITTEST_TARGETS} PROPERTY CXX_EXTENSIONS OFF)
 include(GoogleTest)
 foreach(T ${UNITTEST_TARGETS})
   target_sources(${T} PUBLIC ${ARCHWAY_NODE_PROCESSORS_SRC})
-  target_link_libraries(${T} PRIVATE archway_lib yaml-cpp drogon GTest::GTest)
+  target_link_libraries(
+    ${T} PRIVATE 
+    archway_lib 
+    yaml-cpp 
+    drogon 
+    GTest::GTest 
+    ${GMOCK_BOTH_LIBRARIES}
+  )
   #target_link_libraries(${T} PRIVATE yaml-cpp drogon GTest::GTest)
   target_include_directories(${T} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../archway)
   gtest_discover_tests(${T})

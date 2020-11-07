@@ -36,6 +36,8 @@ namespace archway {
         std::any in_context = nullptr
       ) = 0;
 
+      virtual ~NodeProcessorBase() {}
+
   };
 
 
@@ -87,6 +89,8 @@ namespace archway {
   class NodeProcessor : public virtual NodeProcessorBase {
 
     public:
+
+      virtual ~NodeProcessor() {}
 
     protected:
 

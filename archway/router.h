@@ -7,6 +7,8 @@
 #include <string>
 #include <unordered_map>
 #include <map>
+#include <drogon/HttpClient.h>
+#include <drogon/drogon_callbacks.h>
 #include "host_program.h"
 #include "backend.h"
 #include "utils/expected.h"
@@ -20,7 +22,9 @@ namespace archway {
 
     public:
 
-      Router();
+      Router(std::function<drogon::HttpClientPtr(
+        const std::string&)> in_http_client_factory
+      );
 
       void AddBackend(const std::shared_ptr<Backend> in_backend) {
         
@@ -80,9 +84,18 @@ namespace archway {
         default_host_program_ = in_host_program;
       }
       
-      Expected<void> Route(const drogon::HttpRequestPtr& in_request);
+      
+      Expected<void> Route(
+        const drogon::HttpRequestPtr& in_request,
+        drogon::AdviceCallback&& in_drogon_advice_callback
+      );
 
-      Expected<void> MoveToNextState(std::shared_ptr<Message>& in_message);
+      Expected<void> ExecuteNextStage(std::shared_ptr<Message>& in_message);
+
+      
+      std::function<drogon::HttpClientPtr(const std::string&)> HttpClientFactory() {
+        return http_client_factory_;
+      }
 
 
     private:
@@ -90,8 +103,9 @@ namespace archway {
       std::unordered_map<std::string, std::shared_ptr<HostProgram>> host_programs_by_exact_names;
       std::map<std::string, std::shared_ptr<HostProgram>> host_programs_by_wildcard;
       std::shared_ptr<HostProgram>  default_host_program_; 
-      HostProgram build_in_stage_functions_;
+      HostProgram built_in_stage_functions_;
       std::unordered_map<std::string, int> backends_map_;
       std::vector<std::shared_ptr<Backend>> backends_vector;
+      std::function<drogon::HttpClientPtr(const std::string&)> http_client_factory_;
   };
 }

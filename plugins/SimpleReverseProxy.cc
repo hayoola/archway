@@ -143,31 +143,31 @@ void SimpleReverseProxy::preRouting(
     LOG_DEBUG << "Before sendRequest";
 
     clientPtr->sendRequest(
-        req,
-        [callback = std::move(callback)](
-            ReqResult result,
-            const HttpResponsePtr &resp
-        ) {
-            
-            if (result == ReqResult::Ok) {
-                
-                LOG_DEBUG << "Response received!";
+      req,
+      [callback = std::move(callback)](
+          ReqResult result,
+          const HttpResponsePtr &resp
+      ) {
+          
+          if (result == ReqResult::Ok) {
+              
+              LOG_DEBUG << "Response received!";
 
-                auto headers = resp->headers();
-                auto the_body{ resp->body() };    
-                
-                resp->setPassThrough(true);
-                //resp->removeHeader("transfer-encoding");
-                callback(resp);
-            
-            } else {
-                
-                LOG_DEBUG << "Error received!!";
-                
-                auto errResp = HttpResponse::newHttpResponse();
-                errResp->setStatusCode(k500InternalServerError);
-                callback(errResp);
-            }
-        }
+              auto headers = resp->headers();
+              auto the_body{ resp->body() };    
+              
+              resp->setPassThrough(true);
+              //resp->removeHeader("transfer-encoding");
+              callback(resp);
+          
+          } else {
+              
+              LOG_DEBUG << "Error received!!";
+              
+              auto errResp = HttpResponse::newHttpResponse();
+              errResp->setStatusCode(k500InternalServerError);
+              callback(errResp);
+          }
+      }
     );
 }

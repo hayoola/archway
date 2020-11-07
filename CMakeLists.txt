@@ -67,7 +67,10 @@ file(GLOB_RECURSE ARCHWAY_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/archway/*.cc)
 #message(STATUS "Archway files: " ${ARCHWAY_SRC})
 
 if(BUILD_TESTING)
+  set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules/)
+
   find_package(GTest)
+  find_package(GMock)
 
   if(GTest_FOUND)
     message(STATUS "GTest found")
@@ -77,6 +80,11 @@ if(BUILD_TESTING)
     #### The following line is needed to supress the wierd CTest
     ####  warning about not finding 'DartConfiguration.tcl' file!
     include(CTest)
+
+    if(GMOCK_FOUND)
+      message(STATUS "GMock found")
+    endif(GMOCK_FOUND)
+
   endif(GTest_FOUND)
 
 endif(BUILD_TESTING)

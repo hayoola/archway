@@ -52,6 +52,7 @@ TEST(Archway_Skeleton_Test, NodeProcessor) {
   EXPECT_NE( archway::NodeProcessorRegistry::NewInstance("_root_"), nullptr);
 }
 
+
 TEST(Archway_Skeleton_Test, Compiler) {
 
   const std::string the_yaml = R"(
@@ -71,13 +72,15 @@ TEST(Archway_Skeleton_Test, Compiler) {
             - setBackend: baseOne
   )";
 
-  archway::Archway  the_archway;
+  archway::Archway  the_archway( [](const std::string&) { return nullptr; } );
+  //auto the_archway = std::make_shared<Archway>(nullptr);
   archway::Compiler the_compiler(the_archway);
   int the_result = the_compiler.Compile(the_yaml);
   
   EXPECT_EQ(the_result, 0);
 
 }
+
 
 
 TEST(Archway_Skeleton_Test, string_utils) {

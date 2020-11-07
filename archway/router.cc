@@ -6,6 +6,7 @@
 
 
 #include <exception>
+#include <drogon/HttpTypes.h>
 #include "router.h"
 #include "utils/string_utils.h"
 #include "utils/expected.h"
@@ -55,7 +56,14 @@ struct ReceiveRequestHandler {
       int the_backend_idx = 0;  // The default backend is the first one
       if( the_backend_idx_ptr ) {
         the_backend_idx = *the_backend_idx_ptr;
+      
+      } else {
+
+        // There is no backend index param inside the message, so we set it here!
+        in_message->parameter(ParamID::kBackendIndex) = the_backend_idx;
       }
+
+      
 
 
       auto the_router = std::any_cast<std::shared_ptr<Router>> (
@@ -67,7 +75,7 @@ struct ReceiveRequestHandler {
         break;
       }
 
-      the_result = (*the_router)->MoveToNextState(in_message);
+      the_result = (*the_router)->ExecuteNextStage(in_message);
 
 
     } while( false );
@@ -98,7 +106,79 @@ struct FetchResponseHandler {
         break;
       }
 
+      
+      auto the_router = std::any_cast<std::shared_ptr<Router>> (
+        &(in_message->parameter(ParamID::kRouterPtr))
+      );
+      
+      if( ! the_router ) {
+        the_result = RoutingError("There is not a pointer to the Router inside in_message!");
+        break;
+      }
+      
+      auto the_backend_idx_ptr = std::any_cast<int> (
+        &(in_message->parameter(ParamID::kBackendIndex))   // Use pointer any_cast to not throw!
+      );
 
+      if( ! the_backend_idx_ptr ) {
+        the_result = RoutingError("No backend was set before!");
+        break;
+      }
+
+      int the_backend_idx = *the_backend_idx_ptr;
+      auto the_backend = (*the_router)->GetBackend(the_backend_idx);
+      if( !the_backend ) {
+        the_result = RoutingError("The backend pointer is null !");
+        break;
+      }
+
+      the_result = the_backend->Fetch(
+        (*the_router)->HttpClientFactory(),
+        in_message,
+        [] (std::shared_ptr<Message>& in_response_message) {
+
+          Expected<void> the_callback_result{};
+
+          do {
+
+            auto the_fetch_result_ptr = std::any_cast<drogon::ReqResult> (
+              &(in_response_message->parameter(ParamID::kFetchStatus))  // Use pointer any_cast to not throw!
+            );
+
+            if( !the_fetch_result_ptr ) {
+              the_callback_result = RoutingError("There is no fetch result status in the message !");
+              break;
+            }
+
+            auto the_fetch_result = *the_fetch_result_ptr;
+            if( the_fetch_result == drogon::ReqResult::Ok ) {
+
+              // We know `in_response_message` contains a valid response
+              //  So on the next stage we have chance to process this reponse
+              in_response_message->parameter(ParamID::kStage) = Stage::kBackendResponse;
+            
+            } else {
+
+              // On the next stage, we should synthesize an error response 
+              in_response_message->parameter(ParamID::kStage) = Stage::kBackendError;
+            }
+
+            auto the_router = std::any_cast<std::shared_ptr<Router>> (
+              &(in_response_message->parameter(ParamID::kRouterPtr))
+            );
+
+            if( ! the_router ) {
+              the_callback_result = RoutingError("There is no pointer to router inside the response message !");
+              break;
+            }
+
+            the_callback_result = (*the_router)->ExecuteNextStage( in_response_message);
+
+          } while (false);
+
+          return the_callback_result;
+        }
+      );
 
       // Now we should create a drogon HttpClient and hand over the request
       // These are the questions:
@@ -110,27 +190,10 @@ struct FetchResponseHandler {
       //        initialized during the drogon plugin's `initAndStart` method
       //        so the Router's constructor looks like a proper place for
       //        initializing the `drogon::IOThreadStorage` data members
-
-      
-      // Inside the callback function:
-      {
-        // We set the next stage, based on the result of the Fetch proccess
-        //TODO: Change this NOT to always OK!
-        // in_message->parameter(ParamID::kStage) = Stage::kBackendResponse;
-
-        /*
-        auto the_router = std::any_cast<std::shared_ptr<Router>> (
-          &(in_message->parameter(ParamID::kRouterPtr))
-        );
-
-        if( ! the_router ) {
-          the_result = RoutingError("There is not a pointer to the Router inside in_message!");
-          break;
-        }
-
-        the_result = (*the_router)->MoveToNextState(in_message);
-        */
-      }
+      //
+      // ? Actually, we don't have to create a HttpClient here anymore!
+      //  ? Since we handover this burden to the backend, so we just call `Fetch`
+      //  ? and wait till the provided callback gets called
 
 
     } while( false );
@@ -159,7 +222,20 @@ struct BackendResponseHandler {
         break;
       }
 
+      in_message->parameter(ParamID::kStage) = Stage::kDeliver;
 
+      //TODO: Call the dynamic function
+
+      auto the_router = std::any_cast<std::shared_ptr<Router>> (
+        &(in_message->parameter(ParamID::kRouterPtr))
+      );
+
+      if( ! the_router ) {
+        the_result = RoutingError("There is no pointer to router inside the response message !");
+        break;
+      }
+
+      the_result = (*the_router)->ExecuteNextStage( in_message);
 
     } while( false );
 
@@ -216,6 +292,29 @@ struct DeliverResponseHandler {
         break;
       }
 
+      // TODO: Find the `DeliverResponse` dynamic function and call it
+
+      // The dynamic function can't change the next stage, because here is the end!
+      in_message->parameter(ParamID::kStage) = Stage::kEnd;
+
+      auto the_drogon_advice_callback_ptr = std::any_cast<drogon::AdviceCallback> (
+        &(in_message->parameter(ParamID::kDrogonAdviseCallback))  // Use pointer any_cast to not throw!
+      );
+
+      if(! the_drogon_advice_callback_ptr ) {
+        the_result = RoutingError("There is no Drogon Advice Callback inside the message!");
+        break;
+      }
+
+      auto the_response = in_message->Response();
+      if( !the_response ) {
+        the_result = RoutingError("There is no Response inside the message");
+        break;
+      }
+
+      // It's time to deliver!
+      (*the_drogon_advice_callback_ptr)(the_response);
+
 
     } while( false );
 
@@ -228,22 +327,26 @@ struct DeliverResponseHandler {
 
 
 
-Router::Router() : 
-default_host_program_(nullptr) {
+Router::Router(std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory) : 
+  http_client_factory_(in_http_client_factory),
+  default_host_program_(nullptr) {
 
 
-  // Initialize `build_in_stage_functions_` with function objects
+  // Initialize `built_in_stage_functions_` with function objects
   //  that are defined in this file
-  build_in_stage_functions_.SetFunctionForStage( ReceiveRequestHandler(), Stage::kReceive);
-  build_in_stage_functions_.SetFunctionForStage( FetchResponseHandler(), Stage::kBackendFetch);
-
+  built_in_stage_functions_.SetFunctionForStage( ReceiveRequestHandler(), Stage::kReceive);
+  built_in_stage_functions_.SetFunctionForStage( FetchResponseHandler(), Stage::kBackendFetch);
+  built_in_stage_functions_.SetFunctionForStage( BackendResponseHandler(), Stage::kBackendResponse);
+  built_in_stage_functions_.SetFunctionForStage( BackendErrorHandler(), Stage::kBackendError);
+  built_in_stage_functions_.SetFunctionForStage( DeliverResponseHandler(), Stage::kDeliver);
 }
 
 
 
 
 Expected<void> Router::Route(
-  const drogon::HttpRequestPtr& in_request
+  const drogon::HttpRequestPtr& in_request,
+  drogon::AdviceCallback&& in_drogon_advice_callback
 ) {
 
   Expected<void> the_result{};  // A successful Expected<void>
@@ -258,9 +361,11 @@ Expected<void> Router::Route(
 
   if( the_host_program ) {
 
-    //Message the_message(in_request);
     auto the_message = std::make_shared<Message>(in_request);
     the_message->parameter(ParamID::kHostProgram) = the_host_program;
+
+    // Store the drogon advice callback, which should be called to deliver the response
+    the_message->parameter(ParamID::kDrogonAdviseCallback) = in_drogon_advice_callback;
     
     // We store a pointer to the Router for static functions to call 
     //  its `MoveToNextStage` method
@@ -268,7 +373,7 @@ Expected<void> Router::Route(
     
     // Before the call to `MoveToNextStage` we should set the next stage!
     the_message->parameter(ParamID::kStage) = Stage::kReceive;
-    the_result = MoveToNextState( the_message);
+    the_result = ExecuteNextStage( the_message);
   
   } else {
 
@@ -283,7 +388,7 @@ Expected<void> Router::Route(
 
 
 
-Expected<void> Router::MoveToNextState(
+Expected<void> Router::ExecuteNextStage(
   std::shared_ptr<Message>& in_message
 ) {
 
@@ -293,7 +398,7 @@ Expected<void> Router::MoveToNextState(
 
     auto the_next_stage = std::any_cast<Stage>(in_message->parameter(ParamID::kStage));
     if( the_next_stage == Stage::kStart ) {
-      the_result = RoutingError("We can't be at the starting stage in MoveToNextStage!");
+      the_result = RoutingError("We can't be at the starting stage in ExecuteNextStage!");
     }
 
     if( the_next_stage == Stage::kEnd) {
@@ -309,7 +414,7 @@ Expected<void> Router::MoveToNextState(
       break;
     }
     
-    auto the_function = build_in_stage_functions_.GetStaticFunctionForStage(
+    auto the_function = built_in_stage_functions_.GetStaticFunctionForStage(
       static_cast<Stage>(the_next_stage)
     );
     

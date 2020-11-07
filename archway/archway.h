@@ -10,6 +10,7 @@
 
 
 #include <string>
+#include <drogon/HttpClient.h>
 #include "backend.h"
 #include "host_program.h"
 #include "router.h"
@@ -22,7 +23,7 @@ namespace archway {
 
     public:
 
-      Archway();
+      Archway( std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory );
 
       
       std::shared_ptr<Archway> shared_ptr() {
@@ -31,20 +32,20 @@ namespace archway {
       
       void AddBackend(const std::shared_ptr<Backend> in_backend) {
         
-        router_.AddBackend(in_backend);
+        router_->AddBackend(in_backend);
       }
 
 
       int GetBackendIndex(const std::string& in_name) {
 
-        return router_.GetBackendIndex(in_name);
+        return router_->GetBackendIndex(in_name);
       }
 
       
       
       std::shared_ptr<Backend> GetBackend( int in_index) {
 
-        return router_.GetBackend(in_index);
+        return router_->GetBackend(in_index);
       }
 
       
@@ -53,21 +54,21 @@ namespace archway {
         const std::vector<std::string>& in_host_names,
         const std::shared_ptr<HostProgram> in_host_program
       ) {
-        router_.AddHostProgram(in_host_names, in_host_program);
+        router_->AddHostProgram(in_host_names, in_host_program);
       }
 
 
       std::shared_ptr<HostProgram> FindHostProgram(
         const std::string& in_host_name
       ) {
-        return router_.FindHostProgram(in_host_name);
+        return router_->FindHostProgram(in_host_name);
       }
 
       
 
     private:
 
-      Router router_;
+      std::shared_ptr<Router> router_;
 
   };
 }

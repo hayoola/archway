@@ -68,7 +68,7 @@ namespace archway {
     kRouterPtr,
     kBackendIndex,
     kHostProgram,
-    kCallbackFunction,
+    kDrogonAdviseCallback,
     kFetchStatus,
     _kLast
     // !! Don't insert any item after _kLast
@@ -108,20 +108,15 @@ namespace archway {
 
       
       /**
-       * Converting constructor.
        * After kBackendFetch stage, we need to put the fetched response
-       *  from backend into the message, so here we construct a copy of
-       *  input Message, which bears a Response object from now on.
+       *  from backend into the message.
+       * Note the response will take the place of the request, so
+       *  after the call to this function, the response object 
+       *  will be lost (deconstructed soon by shared_ptr)
       */
-      Message( 
-        const std::shared_ptr<Message>& in_message,
-        const drogon::HttpResponsePtr& in_response
-      ) :
-        req_resp_(in_response) {
-        
-        params_ = in_message->params_;
+      void SetResponse( const drogon::HttpResponsePtr& in_response ) {
+        req_resp_ = in_response;
       }
-
       
       
       drogon::HttpRequestPtr Request() {
