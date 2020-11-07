@@ -17,7 +17,7 @@ using namespace archway;
 
 int FunctionsNodeProcessor::ProcessNode( 
   const YAML::Node& in_node,
-  Archway* archway,
+  std::shared_ptr<Archway> archway,
   std::any in_context
 ) {
 

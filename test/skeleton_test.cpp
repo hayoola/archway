@@ -72,8 +72,12 @@ TEST(Archway_Skeleton_Test, Compiler) {
             - setBackend: baseOne
   )";
 
-  archway::Archway  the_archway( [](const std::string&) { return nullptr; } );
-  //auto the_archway = std::make_shared<Archway>(nullptr);
+  //archway::Archway  the_archway( [](const std::string&) { return nullptr; } );
+  auto the_archway = std::make_shared<archway::Archway>(
+    [](const std::string&) { 
+      return nullptr; 
+    }
+  );
   archway::Compiler the_compiler(the_archway);
   int the_result = the_compiler.Compile(the_yaml);
   

@@ -32,7 +32,7 @@ namespace archway {
 
       virtual int ProcessNode( 
         const YAML::Node& node,
-        Archway* archway,
+        std::shared_ptr<Archway> archway,
         std::any in_context = nullptr
       ) = 0;
 

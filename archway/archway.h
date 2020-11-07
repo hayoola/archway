@@ -23,7 +23,9 @@ namespace archway {
 
     public:
 
-      Archway( std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory );
+      Archway( 
+        std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory 
+      );
 
       
       std::shared_ptr<Archway> shared_ptr() {

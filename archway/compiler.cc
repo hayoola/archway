@@ -12,7 +12,7 @@
 using namespace archway;
 
 
-Compiler::Compiler( Archway& in_archway) :
+Compiler::Compiler( std::shared_ptr<Archway> in_archway) :
   archway_(in_archway) {
 
 
@@ -28,7 +28,7 @@ int Compiler::Compile(const std::string& in_config_content) {
 
     YAML::Node the_root_node = YAML::Load( in_config_content);
     auto the_root_processor = NodeProcessorRegistry::NewInstance("_root_");
-    the_result = the_root_processor->ProcessNode(the_root_node, &archway_);
+    the_result = the_root_processor->ProcessNode(the_root_node, archway_);
 
   } catch( YAML::ParserException exception) {
 
