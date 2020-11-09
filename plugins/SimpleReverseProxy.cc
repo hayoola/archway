@@ -6,6 +6,7 @@
 
 #include "SimpleReverseProxy.h"
 
+
 using namespace drogon;
 using namespace my_plugin;
 
@@ -13,7 +14,7 @@ void SimpleReverseProxy::initAndStart(const Json::Value &config)
 {
     /// Initialize and start the plugin
     
-    LOG_DEBUG << "starting...";
+    LOG_DEBUG << "starting the plugin...";
     
     if (config.isMember("backends") && config["backends"].isArray()) {
         
@@ -87,7 +88,34 @@ void SimpleReverseProxy::initAndStart(const Json::Value &config)
 
     );
 
-    LOG_DEBUG << "ends";
+
+    // Archway starts here!
+    
+    archway_ = archway::Archway::Create(
+      
+      [](const std::string& in_host_address) { 
+        
+        return drogon::HttpClient::newHttpClient(
+          in_host_address,
+          trantor::EventLoop::getEventLoopOfCurrentThread()
+        );
+      }
+    );
+
+    LOG_DEBUG << "The Archway object got constructed.";
+
+    auto the_compile_result = archway_->Compile("config.yaml");
+    if( the_compile_result.wasSuccessful()) {
+      
+      LOG_DEBUG << "The Archway config file was compiled successfully!";
+    } else {
+
+      LOG_DEBUG << "Error: " << the_compile_result.error();
+      abort();
+    }
+    
+
+    LOG_DEBUG << "end of plugin init";
 }
 
 void SimpleReverseProxy::shutdown()

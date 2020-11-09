@@ -1,0 +1,42 @@
+confVersion: core/v1alpha1
+declarations: 
+- backend:
+    name: baseOne
+    kind: roundRobin
+    hosts:
+    - address: 127.0.0.1:8080
+      probe:
+        httpGet:
+          path: /
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 3
+    - address: 127.0.0.1:8081
+      probe:
+        httpGet:
+          path: /
+          timeoutSeconds: 2
+          periodSeconds: 15
+          failureThreshold: 5
+-  backend:
+    name: baseTwo
+    kind: singleHost
+    hosts:
+    - address: 127.0.0.1:8088
+routines:
+- hostProgram:
+    hosts: [www.akharinkhabr.ir, akharinkhabr.ir]
+    functions:
+    - stage: receiveRequest
+      instructions:
+      - if: 
+        - condition: 'req.url ~ "(?i)(select|update|delete|;)"'
+        - synth: [405, "You are not allowed to access!"]
+      - else:
+        - setBackend: baseOne
+        - return: hash
+    - stage: receiveResponse
+      instructions:
+      - if:
+        - condition: 'resp.url ~ "(\.jpg|\.png|\.gif|\.ico)|NewsImage\.aspx"'
+        - setResponseParam: ["ttl", "5m"]

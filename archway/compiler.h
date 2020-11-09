@@ -21,10 +21,11 @@ namespace archway {
 
     public:
 
-      //TODO: User std::shared_ptr<Archway> as the parameter
       Compiler( std::shared_ptr<Archway> in_archway);
 
       int Compile(const std::string& in_config_content );
+
+      int CompileFile(const std::string& in_file_name);
 
 
       private:

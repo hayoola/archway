@@ -6,7 +6,7 @@ int main() {
     //drogon::app().addListener("0.0.0.0",7671);
     //Load config file
     drogon::app().loadConfigFile("./config.json");
-    std::cout << "The config file was parsed.\n";
+    std::cout << "The drogon config file was parsed.\n";
     //Run HTTP framework,the method will block in the internal event loop
     std::cout << "Starting the web server....\n";
 

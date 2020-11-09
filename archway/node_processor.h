@@ -128,7 +128,7 @@ namespace archway {
 
             NodeProcessorRegistry::registerProcessor( 
               T::YamlNodeName(),
-              []() -> NodeProcessorBase* { return new T;}
+              []() -> NodeProcessorBase* { return new T;}  // TODO: Use make_shared<>
             );
             
 

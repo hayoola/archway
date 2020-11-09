@@ -5,19 +5,51 @@
 
 #include <sstream>
 #include "archway.h"
+#include "compiler.h"
 
 
 using namespace archway;
 
+/**
+ * A dummy descented of the Archway class to address
+ *  the issue of using a protected constructor in
+ *  std::make_shared()
+*/
+struct ArchwayDecendent : public Archway {
+
+};
 
 
-Archway::Archway( 
-  std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory 
+
+std::shared_ptr<Archway> Archway::Create(
+  std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory
+) {
+  
+  auto the_archway_object = std::make_shared<ArchwayDecendent>();
+  the_archway_object->router_ = std::make_shared<Router>(in_http_client_factory);
+  the_archway_object->compiler_ = std::make_shared<Compiler>(
+    the_archway_object->shared_from_this()
+  );
+  
+  return the_archway_object;
+}
+
+
+
+Expected<void> Archway::Compile(
+  const std::string& in_file_name 
 ) {
 
-  router_ = std::make_shared<Router>(in_http_client_factory);
-  
+  Expected<void> the_result{};
 
+  int the_compile_result = compiler_->CompileFile(in_file_name);
+
+  if( the_compile_result != 0 ) {
+
+    the_result = CompileError("Can't compile the config file! error code: " + the_compile_result);
+  }
+
+  return the_result;
 }
 
 

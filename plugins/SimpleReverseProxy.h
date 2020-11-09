@@ -10,6 +10,9 @@
 #include <drogon/drogon.h>
 #include <vector>
 #include <memory>
+#include "archway.h"
+
+
 
 namespace my_plugin
 {
@@ -39,5 +42,7 @@ class SimpleReverseProxy : public drogon::Plugin<SimpleReverseProxy>
                     drogon::AdviceCallback &&,
                     drogon::AdviceChainCallback &&);
     size_t connectionFactor_{1};
+
+    std::shared_ptr<archway::Archway> archway_;
 };
 }  // namespace my_plugin

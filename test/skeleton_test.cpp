@@ -73,7 +73,7 @@ TEST(Archway_Skeleton_Test, Compiler) {
   )";
 
   //archway::Archway  the_archway( [](const std::string&) { return nullptr; } );
-  auto the_archway = std::make_shared<archway::Archway>(
+  auto the_archway = archway::Archway::Create(
     [](const std::string&) { 
       return nullptr; 
     }

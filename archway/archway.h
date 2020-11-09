@@ -14,17 +14,20 @@
 #include "backend.h"
 #include "host_program.h"
 #include "router.h"
+#include "utils/expected.h"
 
 
 
 namespace archway {
 
+  class Compiler;
+
   class Archway : public std::enable_shared_from_this<Archway> {
 
     public:
 
-      Archway( 
-        std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory 
+      static std::shared_ptr<Archway> Create(
+        std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory
       );
 
       
@@ -66,11 +69,34 @@ namespace archway {
         return router_->FindHostProgram(in_host_name);
       }
 
-      
+
+      /**
+       * Facet memebr function for the Compiler object
+      */
+      Expected<void> Compile(
+        const std::string& in_file_name
+      );
+
+
+      /**
+       * Facet member function for the Router object
+      */
+      Expected<void> Route(
+        const drogon::HttpRequestPtr& in_request,
+        drogon::AdviceCallback&& in_drogon_advice_callback
+      );
+
+    protected:
+
+      /**
+       * Protected constructor to prevent direct instantiation
+       * Use the static `Create` factory function, instead.
+      */
+      Archway() {}
 
     private:
 
       std::shared_ptr<Router> router_;
-
+      std::shared_ptr<Compiler> compiler_;
   };
 }
