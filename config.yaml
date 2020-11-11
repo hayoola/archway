@@ -1,13 +1,14 @@
 confVersion: core/v1alpha1
 declarations:
 - backend:
+    # My ancient (!) Apache server 
     name: baseOne
     kind: singleHost
     hosts:
-    - address: 127.0.0.1:8088
+    - address: http://10.100.1.243:80
 routines:
 - hostProgram:
-    hosts: [www.example.com, example.com]
+    hosts: ['*.archway.hayoola.host']
     functions:
       - stage: receiveRequest
         instructions:

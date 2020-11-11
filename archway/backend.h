@@ -48,7 +48,7 @@ namespace archway {
       virtual Expected<void> Fetch(
         std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory,
         std::shared_ptr<Message> & in_message,
-        std::function<Expected<void>(std::shared_ptr<Message>&)> did_fetch_callback
+        std::function<Expected<void>(std::shared_ptr<Message>)> did_fetch_callback
       ) = 0;
 
       const std::string& Name() const {

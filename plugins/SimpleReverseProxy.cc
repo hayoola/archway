@@ -132,6 +132,15 @@ void SimpleReverseProxy::preRouting(
     
     LOG_DEBUG << "====================\n" << "New request... Path: " << req->getPath();
 
+    
+    auto the_route_result = archway_->Route(
+      req,
+      std::move(callback)
+    );
+    
+    
+    
+    /*
     auto the_headers = req->getHeaders();
     
     size_t index;
@@ -179,23 +188,27 @@ void SimpleReverseProxy::preRouting(
           
           if (result == ReqResult::Ok) {
               
-              LOG_DEBUG << "Response received!";
+            LOG_DEBUG << "Response received!";
 
-              auto headers = resp->headers();
-              auto the_body{ resp->body() };    
-              
-              resp->setPassThrough(true);
-              //resp->removeHeader("transfer-encoding");
-              callback(resp);
+            auto headers = resp->headers();
+            auto the_body{ resp->body() };    
+            
+            resp->setPassThrough(true);
+            //resp->removeHeader("accept-ranges");
+
+            headers = resp->headers();
+            callback(resp);
           
           } else {
               
-              LOG_DEBUG << "Error received!!";
-              
-              auto errResp = HttpResponse::newHttpResponse();
-              errResp->setStatusCode(k500InternalServerError);
-              callback(errResp);
+            LOG_DEBUG << "Error received!!";
+            
+            auto errResp = HttpResponse::newHttpResponse();
+            errResp->setStatusCode(k500InternalServerError);
+            callback(errResp);
           }
       }
     );
+    
+    */
 }

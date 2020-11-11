@@ -149,7 +149,7 @@
             //"backends": ["http://10.150.1.168:80"],
             "same_client_to_same_backend": false,
             //The number of connections created by proxy for each backend in very event loop (IO thread).
-            "connection_factor": 1
+            "connection_factor": 5
         }
     }],
     

@@ -56,7 +56,7 @@ class MockSingleHostBackend : public SingleHostBackend {
     MOCK_METHOD3(Fetch, Expected<void>(
       std::function<drogon::HttpClientPtr(const std::string&)>,
       std::shared_ptr<Message> &,
-      std::function<Expected<void>(std::shared_ptr<Message>&)>
+      std::function<Expected<void>(std::shared_ptr<Message>)>
     ));
 
 
@@ -163,7 +163,7 @@ TEST(Archway_Router_Test, Basic_Routing) {
       [the_host_string](
         std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory,
         std::shared_ptr<Message> & in_message,
-        std::function<Expected<void>(std::shared_ptr<Message>&)> did_fetch_callback
+        std::function<Expected<void>(std::shared_ptr<Message>)> did_fetch_callback
       ) {
         
         // A simplified version of SingleHostBackend::Fetch() without thread-local storage
@@ -175,7 +175,7 @@ TEST(Archway_Router_Test, Basic_Routing) {
 
         the_client_ptr->sendRequest(
           the_request,
-          [did_fetch_callback, &in_message] (
+          [did_fetch_callback, in_message] (
             drogon::ReqResult in_fetch_result,
             const drogon::HttpResponsePtr& in_response
           ) {

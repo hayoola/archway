@@ -135,7 +135,7 @@ struct FetchResponseHandler {
       the_result = the_backend->Fetch(
         (*the_router)->HttpClientFactory(),
         in_message,
-        [] (std::shared_ptr<Message>& in_response_message) {
+        [] (std::shared_ptr<Message> in_response_message) {
 
           Expected<void> the_callback_result{};
 
@@ -476,9 +476,18 @@ std::shared_ptr<HostProgram> Router::FindHostProgram(
   const std::string& in_host_name
 ) {
 
-   std::shared_ptr<HostProgram> the_host_program{nullptr};
+  std::shared_ptr<HostProgram> the_host_program{nullptr};
 
-  auto the_iter = host_programs_by_exact_names.find(in_host_name);
+  auto the_normalized_host_name = in_host_name;
+  auto the_port_colon_pos = the_normalized_host_name.find(":");
+  if( the_port_colon_pos != std::string::npos ) {
+    the_normalized_host_name = the_normalized_host_name.substr(
+      0,
+      the_port_colon_pos
+    );
+  }
+
+  auto the_iter = host_programs_by_exact_names.find(the_normalized_host_name);
   if( the_iter != host_programs_by_exact_names.end() ) {
     
     the_host_program = the_iter->second;
@@ -488,7 +497,7 @@ std::shared_ptr<HostProgram> Router::FindHostProgram(
 
     // Look into the wildcard map
     // First wen need to 'invert' in_host_name
-    auto the_inverted_host_name = StringUtils::InvertHostName( in_host_name);
+    auto the_inverted_host_name = StringUtils::InvertHostName( the_normalized_host_name);
     std::string the_found_key{""};
 
     auto the_lower_iter = host_programs_by_wildcard.lower_bound(the_inverted_host_name);

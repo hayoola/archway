@@ -26,6 +26,9 @@ namespace archway {
 
     public:
 
+      /**
+       * The Archway factory method
+      */
       static std::shared_ptr<Archway> Create(
         std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory
       );
@@ -92,7 +95,10 @@ namespace archway {
        * Protected constructor to prevent direct instantiation
        * Use the static `Create` factory function, instead.
       */
-      Archway() {}
+      Archway() :
+      router_(nullptr), compiler_(nullptr) {
+
+      }
 
     private:
 

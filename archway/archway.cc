@@ -21,6 +21,7 @@ struct ArchwayDecendent : public Archway {
 
 
 
+
 std::shared_ptr<Archway> Archway::Create(
   std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory
 ) {
@@ -36,11 +37,17 @@ std::shared_ptr<Archway> Archway::Create(
 
 
 
+
+
 Expected<void> Archway::Compile(
   const std::string& in_file_name 
 ) {
 
   Expected<void> the_result{};
+
+  if( ! compiler_ ) {
+    return CompileError("The Compiler object hasn't been constructed!");
+  }
 
   int the_compile_result = compiler_->CompileFile(in_file_name);
 
@@ -53,4 +60,17 @@ Expected<void> Archway::Compile(
 }
 
 
+
+
+Expected<void> Archway::Route(
+  const drogon::HttpRequestPtr& in_request,
+  drogon::AdviceCallback&& in_drogon_advice_callback
+) {
+
+  Expected<void> the_result{};
+
+  the_result = router_->Route( in_request, std::move(in_drogon_advice_callback));
+
+  return the_result;
+}
 

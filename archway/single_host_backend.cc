@@ -7,6 +7,8 @@
 #include "single_host_backend.h"
 #include <drogon/HttpTypes.h>
 
+#include "router.h"
+
 
 using namespace archway;
 
@@ -76,7 +78,7 @@ int SingleHostBackend::HandleEvent(
 Expected<void> SingleHostBackend::Fetch(
   std::function<drogon::HttpClientPtr(const std::string&)> in_http_client_factory,
   std::shared_ptr<Message>& in_message,
-  std::function<Expected<void>(std::shared_ptr<Message>&)> did_fetch_callback
+  std::function<Expected<void>(std::shared_ptr<Message>)> did_fetch_callback
 ) {
 
   Expected<void> the_result{};
@@ -109,11 +111,13 @@ Expected<void> SingleHostBackend::Fetch(
 
     the_client_ptr->sendRequest(
       the_request,
-      [did_fetch_callback, &in_message] (
+      [did_fetch_callback, in_message] (
         drogon::ReqResult in_fetch_result,
         const drogon::HttpResponsePtr& in_response
       ) {
 
+        LOG_DEBUG << "sendRequest callback!";
+        
         in_message->parameter(ParamID::kFetchStatus) = in_fetch_result;
 
         auto the_response = in_response;
@@ -125,8 +129,10 @@ Expected<void> SingleHostBackend::Fetch(
           the_response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);
         }
 
+        the_response->setPassThrough(true);
         in_message->SetResponse(the_response);
         auto the_result = did_fetch_callback( in_message);
+        
       }
     );
 
