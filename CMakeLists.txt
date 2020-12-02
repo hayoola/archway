@@ -38,6 +38,9 @@ add_subdirectory(third-party/yaml-cpp/)
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp)
 
 
+# Add cpp_redis and tacopie libraries
+# TODO: Remove tacopie as soon as we develope a trantor-based adaptor for cpp_redis
+target_link_libraries(${PROJECT_NAME} PRIVATE cpp_redis tacopie)
 
 # Add a static lib target to be linked with our tests
 add_library(${PROJECT_NAME}_lib STATIC main.cc)

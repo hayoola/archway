@@ -86,11 +86,12 @@ Expected<void> SingleHostBackend::Fetch(
   do {
 
     size_t the_index;
-    auto &the_clients_vector = *clients_;   // The * operator of IOThreadStorage return the local storage
-    //auto &the_clients_vector = clients_;
+    
+    // The * operator of IOThreadStorage returns the local storage
+    auto &the_clients_vector = *clients_;
 
     the_index = ++(*client_index_) % the_clients_vector.size();
-    //the_index = ++client_index_ % the_clients_vector.size();
+    
     auto &the_client_ptr = the_clients_vector[the_index];
 
     if( !the_client_ptr ) {

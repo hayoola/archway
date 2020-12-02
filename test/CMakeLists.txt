@@ -20,12 +20,18 @@ add_executable(
 )
 
 
+add_executable(
+  redis_test_unittest redis_test.cpp
+)
+
+
 
 set(UNITTEST_TARGETS
   skeleton_test_unittest
   message_test_unittest
   host_program_test_unittest
   router_test_unittest
+  redis_test_unittest
 )
 
 # Since archway NodeProcessor objects register themselves durng
@@ -61,6 +67,8 @@ foreach(T ${UNITTEST_TARGETS})
     archway_lib 
     yaml-cpp 
     drogon 
+    cpp_redis 
+    tacopie 
     GTest::GTest 
     ${GMOCK_BOTH_LIBRARIES}
   )
