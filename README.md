@@ -1,7 +1,7 @@
 # Archway
 
 A scalable caching reverse-proxy designed to be cloud-native.
-Inspired by Varnish, but uses a simpler configuration language.
+Inspired by Varnish, but uses non-blocking I/O rather than thread pools.
 
 
 
