@@ -1,6 +1,14 @@
 /**
  *
  *  plugin_SimpleReverseProxy.cc
+ * 
+ * Note: This is the original drogon reverse-proxy plugin sample.
+ *  We use it for testing issues againt the drogon vanila code.
+ *  In this way, we can find out the problem is in the Archway
+ *  code-base or inherent to drogon.
+ * 
+ * By the way, we don't use the plugin mechanism of drogon
+ *  to setup or run Archway reverse-proxy
  *
  */
 
