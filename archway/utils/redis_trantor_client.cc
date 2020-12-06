@@ -35,11 +35,12 @@ void RedisTrantorClient::connect(
 
   auto this_ptr = shared_from_this();
   std::weak_ptr<RedisTrantorClient> the_weak_this = this_ptr;
-  was_connection_attempt_done_ = false;
+  //was_connection_attempt_done_ = false;
 
   tcp_client_->setConnectionCallback(
     [the_weak_this] (const trantor::TcpConnectionPtr &in_connection_ptr) {
 
+      
       auto this_ptr = the_weak_this.lock();
       if( !this_ptr ) {
         return;
@@ -55,8 +56,8 @@ void RedisTrantorClient::connect(
         this_ptr->is_connected_ = false;   
       }
 
-      this_ptr->was_connection_attempt_done_ = true;
-      this_ptr->connecting_condition_.notify_one();
+      //this_ptr->was_connection_attempt_done_ = true;
+      //this_ptr->connecting_condition_.notify_one();
     }
   );
 
@@ -72,8 +73,8 @@ void RedisTrantorClient::connect(
       }
 
       this_ptr->is_connected_ = false; 
-      this_ptr->was_connection_attempt_done_ = true;
-      this_ptr->connecting_condition_.notify_one();
+      //this_ptr->was_connection_attempt_done_ = true;
+      //this_ptr->connecting_condition_.notify_one();
 
     }
   );
@@ -107,12 +108,18 @@ void RedisTrantorClient::connect(
 
   tcp_client_->connect();
 
-  // Since this member function is blocking (WHAT ?!),
-  //  we have to wait here for the connection attempt to get completed
+  // Based on cpp_redis library specifications, this function member
+  //  should block until the connection get established.
+  // But we need to call this function before
+  //  starting the event loop, so waiting here means deadlock!
+  
+
+  /*
   std::unique_lock<std::mutex> the_lock(waiting_mutex_);
   connecting_condition_.wait( the_lock, [this] {
     return was_connection_attempt_done_;
   });
+  */
 
 }
 

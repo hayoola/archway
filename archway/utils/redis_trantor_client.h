@@ -107,9 +107,9 @@ namespace archway {
 
       read_request last_read_request_;
 
-      std::mutex waiting_mutex_;
-      std::condition_variable connecting_condition_;
-      bool  was_connection_attempt_done_;
+      //std::mutex waiting_mutex_;
+      //std::condition_variable connecting_condition_;
+      //bool  was_connection_attempt_done_;
   };
 
 }

@@ -1,6 +1,16 @@
+/**
+ * main.cc
+ * 
+ * Archway main source file
+ * 
+ */
+
+
 #include <drogon/drogon.h>
+#include <cpp_redis/cpp_redis>
 #include <iostream>
 #include "archway.h"
+#include "utils/redis_trantor_client.h"
 
 
 
@@ -31,7 +41,6 @@ int main() {
     }
 
     drogon::app().registerPreRoutingAdvice(
-        
       [the_archway](
         const drogon::HttpRequestPtr &req,
         drogon::AdviceCallback &&callback,
@@ -47,6 +56,45 @@ int main() {
       }
 
     );
+
+    auto the_redis_tcp_adapter = std::make_shared<archway::RedisTrantorClient>();
+    auto the_client = std::make_shared<cpp_redis::client>(the_redis_tcp_adapter);
+
+    the_client->connect("127.0.0.1", 6379, [](
+      const std::string& in_host, 
+      std::size_t in_port, 
+      cpp_redis::connect_state in_status) {
+      
+      if (in_status == cpp_redis::connect_state::dropped) {
+        LOG_DEBUG << "Redis Client dropped from " << in_host << ":" << in_port;
+      
+      } else if( in_status == cpp_redis::connect_state::start ) {
+        LOG_DEBUG << "Starting to connect to Redis ...";
+      
+      } else if( in_status == cpp_redis::connect_state::ok ) {
+        LOG_DEBUG << "Redis Connection established!";
+        
+      }
+    
+    });
+
+
+    drogon::app().registerBeginningAdvice(
+      [the_client]() { 
+        
+        LOG_DEBUG << "Event loop was started";
+
+        if( the_client->is_connected() ) {
+          LOG_DEBUG << "Redis is ready.";
+        
+        } else {
+          LOG_DEBUG << "Redis has not ready yes!";
+          // TODO: Devise a timer-like mechanism to check for connection after a timeout
+        }
+
+      }
+    );
+    
     
     // Set HTTP listener address and port
     // TODO: Use our own general config file
