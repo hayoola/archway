@@ -23,7 +23,7 @@ routines:
 ```
 
 Here we've declared a simple backend, then instructed the proxy to match `*.archway.hayoola.host` domain name and subsequently run a `hostProgram`.  
-Inside the hostProgram, we have a `function` registered to tun at the `receiveRequest` stage of the request processing. This function simply set the backend here, but can be more complex.
+Inside the hostProgram, we have a `function` registered to run at the `receiveRequest` stage of the request processing. This function simply set the backend here, but can be more complex.
 <br/>  
 <br/>  
   
