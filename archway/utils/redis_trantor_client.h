@@ -25,7 +25,8 @@ namespace archway {
         tcp_client_(nullptr),
         loop_(nullptr),
         is_connected_(false),
-        last_read_request_({0, nullptr}) {
+        last_read_request_({0, nullptr}),
+        on_connected_handler_(nullptr) {
 
       }
 
@@ -96,11 +97,19 @@ namespace archway {
         const disconnection_handler_t& disconnection_handler
       ) override;
 
+
+      void set_on_connected_handler(
+        const std::function<void(bool in_was_successful )>& in_connected_handler
+      ) {
+        on_connected_handler_ = in_connected_handler;
+      }
+
     private:
 
       void on_receive_message(const trantor::TcpConnectionPtr &, trantor::MsgBuffer *);
 
       std::shared_ptr<trantor::TcpClient> tcp_client_;
+      std::function<void(bool )> on_connected_handler_;
       trantor::EventLoop *loop_;
       trantor::InetAddress address_;
       bool is_connected_;

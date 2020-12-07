@@ -58,25 +58,20 @@ int main() {
     );
 
     auto the_redis_tcp_adapter = std::make_shared<archway::RedisTrantorClient>();
+    the_redis_tcp_adapter->set_on_connected_handler( [](bool in_was_successful ) {
+
+      if( in_was_successful ) {
+        LOG_DEBUG << "Redis connection was established!";
+      
+      } else {
+        LOG_DEBUG << "Can't connect to Redis!";
+      }
+      
+    });
+
     auto the_client = std::make_shared<cpp_redis::client>(the_redis_tcp_adapter);
 
-    the_client->connect("127.0.0.1", 6379, [](
-      const std::string& in_host, 
-      std::size_t in_port, 
-      cpp_redis::connect_state in_status) {
-      
-      if (in_status == cpp_redis::connect_state::dropped) {
-        LOG_DEBUG << "Redis Client dropped from " << in_host << ":" << in_port;
-      
-      } else if( in_status == cpp_redis::connect_state::start ) {
-        LOG_DEBUG << "Starting to connect to Redis ...";
-      
-      } else if( in_status == cpp_redis::connect_state::ok ) {
-        LOG_DEBUG << "Redis Connection established!";
-        
-      }
-    
-    });
+    the_client->connect("127.0.0.1", 6379);
 
 
     drogon::app().registerBeginningAdvice(

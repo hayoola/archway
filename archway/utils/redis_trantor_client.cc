@@ -56,6 +56,11 @@ void RedisTrantorClient::connect(
         this_ptr->is_connected_ = false;   
       }
 
+
+      if( this_ptr->on_connected_handler_ ) {
+        this_ptr->on_connected_handler_ (this_ptr->is_connected_);
+      }
+
       //this_ptr->was_connection_attempt_done_ = true;
       //this_ptr->connecting_condition_.notify_one();
     }
@@ -72,7 +77,12 @@ void RedisTrantorClient::connect(
         return;
       }
 
-      this_ptr->is_connected_ = false; 
+      this_ptr->is_connected_ = false;
+
+      if( this_ptr->on_connected_handler_ ) {
+        this_ptr->on_connected_handler_ (false);
+      }
+
       //this_ptr->was_connection_attempt_done_ = true;
       //this_ptr->connecting_condition_.notify_one();
 

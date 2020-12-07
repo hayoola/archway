@@ -1,7 +1,7 @@
 # Archway
 
 A scalable caching reverse-proxy designed to be cloud-native.
-It's inspired by Varnish, but thanks to the drogon framework, it uses a non-blocking I/O architecture rather than thread pools.  
+It's inspired by [Varnish](https://github.com/varnishcache/varnish-cache), but thanks to the [drogon](https://github.com/an-tao/drogon) framework, it uses a non-blocking I/O architecture rather than thread pools.  
 Let's look at a bare minimum config file:
 
 ```
