@@ -8,6 +8,7 @@
 #include "compiler.h"
 
 
+
 using namespace archway;
 
 /**
@@ -31,6 +32,8 @@ std::shared_ptr<Archway> Archway::Create(
   the_archway_object->compiler_ = std::make_shared<Compiler>(
     the_archway_object->shared_from_this()
   );
+
+  the_archway_object->cache_ = std::make_shared<Cache>();
   
   return the_archway_object;
 }

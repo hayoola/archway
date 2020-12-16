@@ -15,6 +15,7 @@
 #include "host_program.h"
 #include "router.h"
 #include "utils/expected.h"
+#include "cache.h"
 
 
 
@@ -89,6 +90,11 @@ namespace archway {
         drogon::AdviceCallback&& in_drogon_advice_callback
       );
 
+      
+      CacheStatus CacheEngineStatus() {
+        return cache_->Status();
+      }
+
     protected:
 
       /**
@@ -104,5 +110,6 @@ namespace archway {
 
       std::shared_ptr<Router> router_;
       std::shared_ptr<Compiler> compiler_;
+      std::shared_ptr<Cache> cache_;
   };
 }
