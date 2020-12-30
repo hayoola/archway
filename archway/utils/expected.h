@@ -49,6 +49,18 @@ namespace archway {
       
       }
   };
+
+
+  class CacheError : public std::logic_error {
+
+    public:
+
+      CacheError(const std::string& in_description) :
+      std::logic_error(in_description) {
+
+      }
+  };
+
 	
 	template<class T>
 	class Expected {

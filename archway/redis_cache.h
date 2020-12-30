@@ -36,6 +36,7 @@ namespace archway {
       Expected<void> Store(
         const std::string& in_key,
         const std::string& in_value,
+        int in_ttl,
         StoreCallback in_store_callback
       );
 
@@ -47,8 +48,37 @@ namespace archway {
 
     private:
 
+      using RegisterScriptCallback = std::function<void(const std::string& in_script_sha1)>;
+
+      
+      /**
+       * A helper class for 'loading' lua scripts into the Redis instance
+      */
+      class LuaScriptRegisterer {
+
+        public:
+
+          LuaScriptRegisterer(
+            std::shared_ptr<cpp_redis::client> in_redis_client
+          ) : redis_(in_redis_client) {
+
+          }
+          
+          Expected<void> Register(
+            const std::string& in_script,
+            RegisterScriptCallback in_register_callback
+          );
+
+        private:
+          std::shared_ptr<cpp_redis::client> redis_;
+
+      };
+
       std::shared_ptr<cpp_redis::client> redis_;
+      std::shared_ptr<LuaScriptRegisterer> script_registerer_;
       CacheStatus redis_status_;
+      std::string lookup_script_sha1_;
+      const static std::string lookup_script_source_;
   };
 
 }

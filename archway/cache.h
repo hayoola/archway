@@ -26,7 +26,7 @@ namespace archway {
   ;
 
   using StoreCallback = 
-    std::function<Expected<void>( const std::string& in_store_result)>
+    std::function<Expected<void>( bool in_was_successful)>
   ;
 
   enum class CacheStatus {
