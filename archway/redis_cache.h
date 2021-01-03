@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <map>
 #include <cpp_redis/cpp_redis>
 #include "utils/expected.h"
 #include "cache.h"
@@ -73,6 +74,32 @@ namespace archway {
           std::shared_ptr<cpp_redis::client> redis_;
 
       };
+
+      /*
+      static LookupStatus std::map<std::string, LookupStatus> s_string_to_lookup_status_map {
+        {"IV", LookupStatus::kInvalidValue}
+
+      };
+      */
+
+      static LookupStatus string_to_lookup_status( std::string in_string ) {
+
+        LookupStatus the_status{LookupStatus::kInvalidValue};
+
+        const static std::map<std::string, LookupStatus> s_string_to_lookup_status_map {
+          {"IR", LookupStatus::kInvalidValue},
+          {"NF", LookupStatus::kNotFound},
+          {"IP", LookupStatus::kInProgress},
+          {"FV", LookupStatus::kFound}
+        };
+
+        auto the_iter = s_string_to_lookup_status_map.find(in_string);
+        if( the_iter != s_string_to_lookup_status_map.end() ) {
+          the_status = the_iter->second;
+        }
+
+        return the_status;
+      }
 
       std::shared_ptr<cpp_redis::client> redis_;
       std::shared_ptr<LuaScriptRegisterer> script_registerer_;

@@ -25,6 +25,11 @@ add_executable(
 )
 
 
+add_executable(
+  redis_cache_unittest redis_cache_test.cpp
+)
+
+
 
 set(UNITTEST_TARGETS
   skeleton_test_unittest
@@ -32,6 +37,7 @@ set(UNITTEST_TARGETS
   host_program_test_unittest
   router_test_unittest
   redis_test_unittest
+  redis_cache_unittest
 )
 
 # Since archway NodeProcessor objects register themselves durng

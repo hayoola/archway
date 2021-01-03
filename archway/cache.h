@@ -17,11 +17,24 @@
 
 namespace archway {
 
+  enum class CacheStatus {
+    kStarting,
+    kConnecting,
+    kReady,
+    kFailed
+  };
+
+  enum class LookupStatus {
+    kInvalidValue = 0,
+    kNotFound,
+    kInProgress,
+    kFound
+  };
+  
   using LookupCallback = 
-    std::function<Expected<void>(
-      // A prior request has been made for this key, but the value is not ready, yet
-      bool is_in_progress,
-      const std::string& in_reply
+    std::function<void(
+      LookupStatus in_lookup_status,
+      const std::string& in_value
     )>
   ;
 
@@ -29,12 +42,7 @@ namespace archway {
     std::function<Expected<void>( bool in_was_successful)>
   ;
 
-  enum class CacheStatus {
-    kStarting,
-    kConnecting,
-    kReady,
-    kFailed
-  };
+  
 
 
   class MemoryCache;

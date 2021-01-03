@@ -102,7 +102,7 @@ class RedisTest : public ::testing::Test {
 
 
 
-TEST_F(RedisTest, SetGet) {
+TEST_F(RedisTest, Playground) {
 
   
   SUCCEED();
@@ -320,9 +320,9 @@ TEST_F(RedisTest, SetGet) {
 
 TEST_F(RedisTest, Test2) {
 
-  int dummy = 767;
+  int dummy{767};
 
-  EXPECT_EQ(dummy, 767);
+  EXPECT_EQ(dummy, 767);  
 }
 
 

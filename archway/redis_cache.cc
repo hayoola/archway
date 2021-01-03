@@ -91,7 +91,7 @@ RedisCache::RedisCache(
   the_redis_tcp_adapter->set_on_connected_handler( [this](bool in_was_successful ) {
 
     if( in_was_successful ) {
-      this->redis_status_ = CacheStatus::kReady;
+      // this->redis_status_ = CacheStatus::kReady;
       LOG_DEBUG << "Redis connection established!";
 
       script_registerer_ = std::make_shared<LuaScriptRegisterer>(redis_);
@@ -101,6 +101,7 @@ RedisCache::RedisCache(
         [this](const std::string& in_script_sha1) {
           
           this->lookup_script_sha1_ = in_script_sha1;
+          this->redis_status_ = CacheStatus::kReady;
           LOG_DEBUG << "Redis Lookup script got registered!";
         }
       );
@@ -126,6 +127,44 @@ Expected<void> RedisCache::Lookup(
 
   Expected<void> the_result{};
 
+  if( lookup_script_sha1_ != "" ) {
+
+    redis_->evalsha(
+      lookup_script_sha1_,
+      {
+        in_key
+      },
+      {
+        "1000"  // TODO: Use a configurable value for 'in-progress TTL
+      },
+      [in_reply_callback](cpp_redis::reply& in_reply) {
+
+        LookupStatus the_status{LookupStatus::kInvalidValue};
+        std::string the_value{""};
+        
+        if( in_reply.is_array() ) {
+
+          auto the_reply = in_reply.as_array();
+
+          auto the_result = the_reply[0].as_string();
+          the_status = RedisCache::string_to_lookup_status( the_result);
+          
+          if( the_status == LookupStatus::kFound ) {
+            the_value = the_reply[1].as_string();
+          }
+        }
+
+        in_reply_callback( the_status, the_value);
+
+      }
+    );
+
+    redis_->commit();
+
+  } else {
+
+    the_result = CacheError("RedisCache lookup script hasn't been registered yet!");
+  }
 
   return the_result;
 }
